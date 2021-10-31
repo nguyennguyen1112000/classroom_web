@@ -1,24 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
-
+import "./App.css";
+import Register from "./components/authentication/register";
+import Login from "./components/authentication/login";
+import Header from "./components/header";
+import VerticalNav from "./components/vertical-nav";
+import CreateClass from "./views/classes/create";
+import { BrowserRouter as Router} from "react-router-dom";
+import PublicRoute from "./router/publicRoute";
+import PrivateRoute from "./router/privateRoute";
+import ClassList from "./views/classes/list";
+import { useSelector } from "react-redux";
 function App() {
+  //const user = useSelector((state) => state.auth.currentUser);
+  const logIn = useSelector((state) => state.auth.isLoggedIn);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        {logIn && <Header />}
+        {logIn && <VerticalNav />}
+        <PublicRoute restricted={true} component={Login} path="/signin" exact />
+        <PublicRoute
+          restricted={true}
+          component={Register}
+          path="/signup"
+          exact
+        />
+        <PrivateRoute component={CreateClass} path="/my-classes/create" exact />
+        <PrivateRoute component={ClassList} path="/" exact />
+
+      </div>
+    </Router>
   );
 }
 
