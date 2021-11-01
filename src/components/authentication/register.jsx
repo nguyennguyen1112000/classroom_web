@@ -126,8 +126,8 @@ function Register() {
           </div>
           <div className="col-lg-6 col-md-8">
             <div className="sign_form">
-              <h2>Welcome to Cursus</h2>
-              <p>Sign Up and Start Learning!</p>
+              <h2>Chào mừng bạn đến với Classroom</h2>
+              <p>Đăng ký và bắt đầu học nào!!</p>
               <form onSubmit={handleSubmit}>
                 {errors.email && (
                   <div
