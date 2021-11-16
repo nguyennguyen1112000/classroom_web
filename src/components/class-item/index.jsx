@@ -9,22 +9,22 @@ ClassItem.propTypes = {
   numOfStudents: PropTypes.number,
 };
 ClassItem.defaultProps = {
-  id: null,
+  code: null,
   name: "",
   topic: "",
   numOfStudents: 0,
 };
 
 function ClassItem(props) {
-    const {id,name,topic, numOfStudents} = props;
-    const link = `/my-classes/${id}`;
+    const {code,name,topic, numOfStudents} = props;
+    const link = `/my-classes/${code}`;
     const history = useHistory();
     function handleClick(){
         return history.push(link);
     }
   return (
     <div
-      key={id}
+      key={code}
       className="col-xl-3 col-lg-4 col-md-6 d-flex align-items-stretch"
     >
       <div className="fcrse_1 mt-30">

@@ -60,8 +60,10 @@ function Header(props) {
               </Link>
             </li>
             <li className="ui dropdown">
-              <Link to="#" className="opts_account" title="Account">
-                <img src="images/hd_dp.jpg" alt="" />
+              <Link to="/setting" className="opts_account" title="Account">
+                <img
+                  src={`${process.env.REACT_APP_PUBLIC_URL}/images/hd_dp.jpg`}
+                />
               </Link>
             </li>
           </ul>

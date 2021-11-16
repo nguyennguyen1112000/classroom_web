@@ -79,7 +79,7 @@ function CreateClass() {
   return (
     <div
       className="course_tabs_1"
-      class="modal fade"
+      className="modal fade"
       id="createClass"
       tabIndex="-1"
       role="dialog"

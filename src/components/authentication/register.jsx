@@ -224,7 +224,7 @@ function Register() {
                   Đăng ký
                 </button>
               </form>
-              <p class="mb-0 mt-30">
+              <p className="mb-0 mt-30">
                 Bạn đã có tài khoản? <Link to="/signin">Đăng nhập</Link>
               </p>
             </div>

@@ -42,3 +42,21 @@ export const createClass = (classroom) => {
       });
   };
 };
+
+export const addUserToClass = (userToClass) => {
+  return (dispatch) => {
+    return axios
+      .post(`${API_URL}/user-to-class`, userToClass, authHeader())
+      .then((res) => {
+        console.log("Add user to class successfully");
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          const logoutAction = userLogout();
+          logOut();
+          dispatch(logoutAction);
+        }
+        console.log("Fail to add user to class");
+      });
+  };
+};

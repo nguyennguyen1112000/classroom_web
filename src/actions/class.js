@@ -13,3 +13,5 @@ export const getAllClasses = (classList) => {
     payload: classList,
   };
 };
+
+

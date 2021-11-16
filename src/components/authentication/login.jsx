@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { userLoginSuccess } from "../../actions/auth";
-import { Redirect } from "react-router";
-import { Link } from "react-router-dom";
+import { Redirect, useHistory } from "react-router";
+import { Link, useLocation } from "react-router-dom";
 function Login() {
   const API_URL = process.env.REACT_APP_API_URL;
   const [input, setInput] = useState({
@@ -13,6 +13,20 @@ function Login() {
   const [error, setError] = useState(null);
   const [redirect, setRedirect] = useState(false);
   const dispatch = useDispatch();
+  let location = useLocation();
+  let history = useHistory();
+  const search = location.search;
+  const access_token = new URLSearchParams(search).get("access_token");
+  const userParam = new URLSearchParams(search).get("user");
+  const redirectTo = new URLSearchParams(search).get("redirectTo");  
+  if (access_token && userParam) {
+    let user = Buffer.from(userParam, "base64").toString();
+    user = JSON.parse(user);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", JSON.stringify(access_token));
+    const action = userLoginSuccess(user);
+    dispatch(action);
+  }
 
   function handleChange(event) {
     if (event.target.name === "email") {
@@ -53,8 +67,8 @@ function Login() {
       });
   }
 
-  if (redirect) {
-    return <Redirect to="/" />;
+  if (redirect) {  
+    history.push(redirectTo == null ? "/" : redirectTo);
   }
   return (
     <div className="sign_in_up_bg">
@@ -74,6 +88,13 @@ function Login() {
             <div className="sign_form">
               <h2>Chào mừng bạn quay lại</h2>
               <p>Đăng nhập vào tài khoản Classroom!</p>
+              <a
+                href={`${API_URL}/google`}
+                className="social_lnk_btn mt-15 color_btn_go"
+              >
+                <i className="uil uil-google" />
+                Continue with Google
+              </a>
               <form onSubmit={handleSubmit}>
                 {error && (
                   <div
