@@ -1,26 +1,37 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import Footer from "../../components/footer";
-
+import { authHeader } from "../../helper/utils";
+import { updateProfile } from "../../actions/auth";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 Setting.propTypes = {};
 
 function Setting(props) {
   const API_URL = process.env.REACT_APP_API_URL;
   const user = useSelector((state) => state.auth.currentUser);
-  console.log("user", user);
-
+  const dispatch = useDispatch();
   const [input, setInput] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
+    birthday: formatDate(user.birthday),
+    sex: user.sex,
   });
+
   const [errors, setErrors] = useState({
     firstName: null,
     lastName: null,
   });
-
-  function handleChange(event) {    
+  function formatDate(date) {
+    const newDate = new Date(date);
+    const day = ("0" + newDate.getDate()).slice(-2);
+    const month = ("0" + (newDate.getMonth() + 1)).slice(-2);
+    const year = ("0" + newDate.getFullYear()).slice(-4);
+    return `${year}-${month}-${day}`;
+  }
+  function handleChange(event) {
     switch (event.target.name) {
       case "firstName":
         setInput({
@@ -34,11 +45,20 @@ function Setting(props) {
           lastName: event.target.value,
         });
         break;
+      case "birthday":
+        setInput({
+          ...input,
+          birthday: event.target.value,
+        });
+        break;
+
       default:
         setInput({
           ...input,
-          role: event.target.value,
+          sex: event.target.value === "true",
         });
+        console.log("input", input);
+
         break;
     }
   }
@@ -65,8 +85,6 @@ function Setting(props) {
       errs.lastName = "Nhập tối đa 64 kí tự";
     }
 
-
-
     setErrors(errs);
 
     return isValid;
@@ -75,22 +93,32 @@ function Setting(props) {
     event.preventDefault();
 
     if (validate()) {
-      console.log('input', input.role=="student");
-      
-      // axios
-      //   .patch(`${API_URL}/users`, input)
-      //   .then((res) => {
-      //     console.log("Update profile successfully", res);
-          
-      //     // let newInput = {};
-      //     // newInput.firstName = "";
-      //     // newInput.lastName = "";
-      //     // setInput(newInput);
-      //   })
-      //   .catch((err) => {
-      //     console.log('Update profile failed',err.message);
-          
-      //   });
+      console.log("input", input);
+      axios
+        .patch(`${API_URL}/users`, input, authHeader())
+        .then((res) => {
+          toast.success("Cập nhật thành công!", {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          const user = res.data;
+          localStorage.setItem("user", JSON.stringify(user));
+          const action = updateProfile(user);
+          dispatch(action);
+
+          // let newInput = {};
+          // newInput.firstName = "";
+          // newInput.lastName = "";
+          // setInput(newInput);
+        })
+        .catch((err) => {
+          console.log("Update profile failed", err.message);
+        });
     }
   }
   return (
@@ -179,6 +207,9 @@ function Setting(props) {
                                       onChange={handleChange}
                                     />
                                   </div>
+                                  <div className="help-block ml-2">
+                                    Họ và tên lót
+                                  </div>
                                 </div>
                               </div>
                               <div className="col-lg-6">
@@ -187,27 +218,87 @@ function Setting(props) {
                                     <input
                                       className="prompt srch_explore"
                                       type="text"
-                                      name="surname"
+                                      name="lastName"
                                       defaultValue={user.lastName}
                                       id="id[surname]"
                                       placeholder="Tên"
                                       onChange={handleChange}
                                     />
                                   </div>
+                                  <div className="help-block ml-2">Tên</div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
-
-                        <div className="row mt-10">
-                          <div className="col-lg-8">
+                            <div className="row">
+                              <div className="col-lg-6">
+                                <div className="ui search focus mt-30">
+                                  <div className="ui left icon input swdh11 swdh19">
+                                    <input
+                                      className="prompt srch_explore"
+                                      type="date"
+                                      name="birthday"
+                                      defaultValue={input.birthday}
+                                      id="id[birthday]"
+                                      min="1900-01-01"
+                                      max="2030-12-31"
+                                      onChange={handleChange}
+                                    />
+                                  </div>
+                                  <div className="help-block ml-2">
+                                    Ngày sinh của bạn
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="row">
+                              <div className="col-lg-6">
+                                <div className="ui search focus mt-30">
+                                  <div className="ui left icon input swdh11 swdh19">
+                                    <ul className="radio--group-inline-container_1">
+                                      <li>
+                                        <div className="radio-item_1">
+                                          <input
+                                            id="male"
+                                            defaultValue="true"
+                                            name="sex"
+                                            type="radio"
+                                            onChange={handleChange}
+                                            checked={input.sex === true}
+                                          />
+                                          <label
+                                            htmlFor="male"
+                                            className="radio-label_1"
+                                          >
+                                            Nam
+                                          </label>
+                                        </div>
+                                      </li>
+                                      <li>
+                                        <div className="radio-item_1">
+                                          <input
+                                            id="female"
+                                            defaultValue="false"
+                                            name="sex"
+                                            type="radio"
+                                            onChange={handleChange}
+                                            checked={input.sex === false}
+                                          />
+                                          <label
+                                            htmlFor="female"
+                                            className="radio-label_1"
+                                          >
+                                            Nữ
+                                          </label>
+                                        </div>
+                                      </li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                             <div className="row">
                               <div className="col-lg-12">
-                                <div className="basic_ptitle">
-                                  <h4>Email của bạn</h4>
-                                </div>
-                                <div className="ui search focus mt-30">
+                                <div className="ui search focus">
                                   <div className="ui left icon labeled input swdh11 swdh31">
                                     <div className="ui label lb12">@</div>
                                     <input

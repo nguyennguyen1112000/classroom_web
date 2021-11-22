@@ -12,6 +12,7 @@ import ClassList from "./views/classes/list";
 import { useSelector } from "react-redux";
 import DetailClass from "./views/classes/detail";
 import PublicClass from "./views/classes/public_class";
+import { ToastContainer } from "react-toastify";
 function App() {
   //const user = useSelector((state) => state.auth.currentUser);
   const logIn = useSelector((state) => state.auth.isLoggedIn);
@@ -20,7 +21,12 @@ function App() {
       <div>
         {logIn && <Header />}
         {logIn && <VerticalNav />}
-        <PublicRoute restricted={false} component={Login} path="/signin" exact />
+        <PublicRoute
+          restricted={false}
+          component={Login}
+          path="/signin"
+          exact
+        />
         <PublicRoute
           restricted={true}
           component={Register}
@@ -32,6 +38,7 @@ function App() {
         <PrivateRoute component={DetailClass} path="/my-classes/:code" exact />
         <PrivateRoute component={PublicClass} path="/classrooms/:code" exact />
         <PrivateRoute component={Setting} path="/setting" exact />
+        <ToastContainer />
       </div>
     </Router>
   );

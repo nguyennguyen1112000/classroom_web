@@ -1,10 +1,12 @@
+import { useTheme } from "@material-ui/core";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, useLocation, useParams } from "react-router";
 import { userLogout } from "../../actions/auth";
 import Footer from "../../components/footer";
-import { authHeader, logOut} from "../../helper/utils";
+import MapStudentModal from "../../components/modal/map-student";
+import { authHeader, logOut } from "../../helper/utils";
 import { addUserToClass } from "../../services/api/class";
 
 function PublicClass(props) {
@@ -12,11 +14,13 @@ function PublicClass(props) {
   const [classroom, setClassroom] = useState();
   const [existed, setExisted] = useState(false);
   const [redirect, setRedirect] = useState(false);
+  const [updateStudentId, setUpdateStudentId] = useState(false);
   const dispatch = useDispatch();
+
   let { code } = useParams();
   const search = useLocation().search;
   const role = new URLSearchParams(search).get("role");
-  console.log("code, role", code, role);
+  //console.log("code, role", code, role);
 
   code = Buffer.from(code, "base64").toString();
   const user = useSelector((state) => state.auth.currentUser);
@@ -38,14 +42,14 @@ function PublicClass(props) {
                 userId: user.id,
                 role: role,
                 classroomId: result.data.id,
-              };              
+              };
               dispatch(addUserToClass(userToClass));
             }
           }
         }
       } catch (error) {
-        console.log('err',error);
-        
+        console.log("err", error);
+
         if (error.response.status === 401) {
           const logoutAction = userLogout();
           logOut();
@@ -54,7 +58,11 @@ function PublicClass(props) {
       }
     };
     fetchData();
-  }, []);
+  }, [updateStudentId]);
+  function handleClick() {
+    setUpdateStudentId(true);
+  }
+
   function formatDate(date) {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }
@@ -205,6 +213,11 @@ function PublicClass(props) {
             </div>
           </div>
         </div>
+        <MapStudentModal
+          userId={user && user.id}
+          classroomId={classroom && classroom.id}
+          handleUpdate = {handleClick}
+        />
         <div className="_215b17">
           <div className="container">
             <div className="row">
@@ -363,6 +376,22 @@ function PublicClass(props) {
                                       <div className="tutor_cate">
                                         {stu.user.email}
                                       </div>
+                                      {user.email == stu.user.email &&
+                                        stu.studentId === null && (
+                                          <button
+                                            className="live_link"
+                                            data-toggle="modal"
+                                            data-target="#mapStudentId"
+                                          >
+                                            Cập nhật MSSV
+                                          </button>
+                                        )}
+                                      {user.email == stu.user.email &&
+                                        stu.studentId && (
+                                          <div className="tutor_cate">
+                                            {stu.studentId}
+                                          </div>
+                                        )}
                                     </div>
                                   </div>
                                 </div>

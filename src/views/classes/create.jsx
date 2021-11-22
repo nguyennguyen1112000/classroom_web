@@ -15,9 +15,7 @@ function CreateClass() {
   });
   const dispatch = useDispatch();
 
-  function handleChange(event) {
-    console.log(event.target.value.length);
-    
+  function handleChange(event) {    
     switch (event.target.name) {
       case "name":
         setInput({

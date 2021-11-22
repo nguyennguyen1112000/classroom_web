@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { userLoginSuccess } from "../../actions/auth";
+import { useDispatch } from "react-redux";
 function Register() {
   const API_URL = process.env.REACT_APP_API_URL;
   const [input, setInput] = useState({
@@ -15,6 +17,7 @@ function Register() {
     firstName: null,
     lastName: null,
   });
+  const dispatch = useDispatch();
 
   function handleChange(event) {
     switch (event.target.name) {
@@ -96,6 +99,7 @@ function Register() {
         .post(`${API_URL}/users`, input)
         .then((res) => {
           console.log("Register successfully", res);
+          login(input.email, input.password);
           let newInput = {};
           newInput.email = "";
           newInput.password = "";
@@ -108,6 +112,20 @@ function Register() {
             setErrors({ email: err.response.data.message });
         });
     }
+  }
+  function login(email, password) {
+    axios
+      .post(`${API_URL}/auth/login`, { email, password })
+      .then((res) => {
+        const { access_token, user } = res.data;
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("token", JSON.stringify(access_token));
+        const action = userLoginSuccess(user);
+        dispatch(action);
+      })
+      .catch((err) => {
+        console.log("Error", err);
+      });
   }
 
   return (
