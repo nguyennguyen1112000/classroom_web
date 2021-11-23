@@ -1,16 +1,32 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAll } from "../../services/api/class";
+import { getAll, getAllJoinedClasses } from "../../services/api/class";
 import ClassItem from "../../components/class-item";
-import CreateClass from "./create";
 import Footer from "../../components/footer";
+import PropTypes from "prop-types";
+ClassList.props = {
+  isMyClasses: PropTypes.bool,
+  isMyJoinedClasses: PropTypes.bool,
+};
+ClassList.defaultProps = {
+  isMyClasses: false,
+  isMyJoinedClasses: false,
+};
 
-function ClassList() {
+function ClassList(props) {
+  const { isMyClasses, isMyJoinedClasses } = props;
+  console.log("props", isMyClasses, isMyJoinedClasses);
+
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getAll());
+    if (isMyClasses) dispatch(getAll());
+    else if(isMyJoinedClasses) {
+      dispatch(getAllJoinedClasses());
+    }
   }, [dispatch]);
-  const classList = useSelector((state) => state.class.classList);
+  const classList = useSelector((state) =>
+    isMyClasses ? state.class.classList : state.class.joinedClasses
+  );
 
   return (
     <div className="wrapper">
@@ -43,6 +59,7 @@ function ClassList() {
                         code={obj.code}
                         name={obj.name}
                         topic={obj.topic}
+                        isMyClasses = {isMyClasses}
                       />
                     );
                   })}
@@ -72,7 +89,6 @@ function ClassList() {
           </div>
         </div>
       </div>
-      <CreateClass />
       <Footer />
     </div>
   );

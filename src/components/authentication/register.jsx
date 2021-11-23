@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router";
+import { Link, useLocation } from "react-router-dom";
 import { userLoginSuccess } from "../../actions/auth";
 import { useDispatch } from "react-redux";
 function Register() {
@@ -17,8 +18,11 @@ function Register() {
     firstName: null,
     lastName: null,
   });
+  const [redirect, setRedirect] = useState(false);
   const dispatch = useDispatch();
-
+  const search = useLocation().search;
+  const redirectTo = new URLSearchParams(search).get("redirectTo");
+let history = useHistory();
   function handleChange(event) {
     switch (event.target.name) {
       case "email":
@@ -122,12 +126,15 @@ function Register() {
         localStorage.setItem("token", JSON.stringify(access_token));
         const action = userLoginSuccess(user);
         dispatch(action);
+        setRedirect(true);
       })
       .catch((err) => {
         console.log("Error", err);
       });
   }
-
+  if (redirect) {
+    history.push(redirectTo == null ? "/" : redirectTo);
+  }
   return (
     <div className="sign_in_up_bg">
       <div className="container">
@@ -242,9 +249,17 @@ function Register() {
                   Đăng ký
                 </button>
               </form>
-              <p className="mb-0 mt-30">
-                Bạn đã có tài khoản? <Link to="/signin">Đăng nhập</Link>
-              </p>
+              {!redirectTo && (
+                <p className="mb-0 mt-30">
+                  Bạn đã có tài khoản? <Link to="/signin">Đăng nhập</Link>
+                </p>
+              )}
+              {redirectTo && (
+                <p className="mb-0 mt-30">
+                  Bạn đã có tài khoản?{" "}
+                  <Link to={`/signin?redirectTo=${redirectTo}`}>Đăng nhập</Link>
+                </p>
+              )}
             </div>
           </div>
         </div>

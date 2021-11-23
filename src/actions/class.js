@@ -1,4 +1,4 @@
-import { CREATE_CLASS, GET_ALL_CLASSES } from "./type";
+import { CREATE_CLASS, GET_ALL_CLASSES, GET_ALL_JOINED_CLASSES } from "./type";
 
 export const addNewClass = (classroom) => {
   return {
@@ -14,4 +14,9 @@ export const getAllClasses = (classList) => {
   };
 };
 
-
+export const getJoinedClasses = (classList) => {
+  return {
+    type: GET_ALL_JOINED_CLASSES,
+    payload: classList,
+  };
+};

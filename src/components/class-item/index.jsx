@@ -7,21 +7,26 @@ ClassItem.propTypes = {
   name: PropTypes.string,
   topic: PropTypes.string,
   numOfStudents: PropTypes.number,
+  isMyClasses: PropTypes.bool,
 };
 ClassItem.defaultProps = {
   code: null,
   name: "",
   topic: "",
   numOfStudents: 0,
+  isMyClasses: false,
 };
 
 function ClassItem(props) {
-    const {code,name,topic, numOfStudents} = props;
-    const link = `/my-classes/${code}`;
-    const history = useHistory();
-    function handleClick(){
-        return history.push(link);
-    }
+  const { code, name, topic, isMyClasses } = props;
+  let link;
+  if(isMyClasses)
+  link = `/my-classes/${code}`;
+  else link=`classrooms/${code}`
+  const history = useHistory();
+  function handleClick() {
+    return history.push(link);
+  }
   return (
     <div
       key={code}
@@ -46,9 +51,6 @@ function ClassItem(props) {
           <button className="live_link" onClick={handleClick}>
             Vào lớp học
           </button>
-          <div className="tut1250">
-            <span className="vdt15">{numOfStudents} sinh viên</span>
-          </div>
         </div>
       </div>
     </div>

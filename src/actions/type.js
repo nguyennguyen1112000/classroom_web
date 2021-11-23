@@ -6,4 +6,5 @@ export const UPDATE_PROFILE = "UPDATE_PROFILE";
 export const LOGOUT = "LOGOUT";
 export const CREATE_CLASS = "CREATE_CLASS";
 export const GET_ALL_CLASSES = 'GET_ALL_CLASSES';
+export const GET_ALL_JOINED_CLASSES = "GET_ALL_JOINED_CLASSES";
 

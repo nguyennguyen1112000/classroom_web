@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
-import TagsInput from "../tags-input";
 import { authHeader, logOut } from "../../helper/utils";
 import axios from "axios";
 import { userLogout } from "../../actions/auth";

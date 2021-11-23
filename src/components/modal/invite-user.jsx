@@ -29,16 +29,16 @@ function InviteUserModal(props) {
       for (let i = 0; i < emails.length; i++) {
         const result = axios
           .post(
-            `${API_URL}/classrooms/invite`,
+            `${API_URL}/classrooms/invite/${classroomId}`,
             {
               email: emails[i],
-              classroomId,
               role,
             },
             authHeader()
           )
           .then((res) => {
             console.log("Response", res);
+            document.getElementById("close-create-modal").click();
           })
           .catch((err) => {
             if (err.response.status === 401) {

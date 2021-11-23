@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { userLoginSuccess } from "../../actions/auth";
-import { Redirect, useHistory } from "react-router";
+import { useHistory } from "react-router";
 import { Link, useLocation } from "react-router-dom";
+import { GoogleLogin } from "react-google-login";
 function Login() {
   const API_URL = process.env.REACT_APP_API_URL;
+  const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
   const [input, setInput] = useState({
     email: "",
     password: "",
@@ -16,17 +18,35 @@ function Login() {
   let location = useLocation();
   let history = useHistory();
   const search = location.search;
-  const access_token = new URLSearchParams(search).get("access_token");
-  const userParam = new URLSearchParams(search).get("user");
-  const redirectTo = new URLSearchParams(search).get("redirectTo");  
-  if (access_token && userParam) {
-    let user = Buffer.from(userParam, "base64").toString();
-    user = JSON.parse(user);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("token", JSON.stringify(access_token));
-    const action = userLoginSuccess(user);
-    dispatch(action);
-  }
+  const redirectTo = new URLSearchParams(search).get("redirectTo");
+
+  const responseGoogle = (response) => {
+    console.log(response);
+    if (response.profileObj) {
+      const { email, googleId, familyName, givenName } = response.profileObj;
+      const input = {
+        email,
+        googleId,
+        firstName: familyName,
+        lastName: givenName,
+      };
+      axios
+        .post(`${API_URL}/google`, input)
+        .then((res) => {
+          console.log("Login successfully", res);
+          const { access_token, user } = res.data;
+          localStorage.setItem("user", JSON.stringify(user));
+          localStorage.setItem("token", JSON.stringify(access_token));
+          const action = userLoginSuccess(user);
+          dispatch(action);
+          setRedirect(true);
+        })
+        .catch((err) => {
+          console.log("Error", err);
+          setError("Đã có lỗi xảy ra trong lúc đăng nhập, vui lòng thử lại");
+        });
+    }
+  };
 
   function handleChange(event) {
     if (event.target.name === "email") {
@@ -67,7 +87,7 @@ function Login() {
       });
   }
 
-  if (redirect) {  
+  if (redirect) {
     history.push(redirectTo == null ? "/" : redirectTo);
   }
   return (
@@ -88,13 +108,24 @@ function Login() {
             <div className="sign_form">
               <h2>Chào mừng bạn quay lại</h2>
               <p>Đăng nhập vào tài khoản Classroom!</p>
-              <a
-                href={`${API_URL}/google`}
-                className="social_lnk_btn mt-15 color_btn_go"
-              >
-                <i className="uil uil-google" />
-                Continue with Google
-              </a>
+              <GoogleLogin
+                clientId={CLIENT_ID}
+                render={(renderProps) => (
+                  <button
+                    onClick={renderProps.onClick}
+                    disabled={renderProps.disabled}
+                    className="social_lnk_btn mt-15 color_btn_go"
+                  >
+                    <i className="uil uil-google" />
+                    Continue with Google
+                  </button>
+                )}
+                buttonText="Login"
+                onSuccess={responseGoogle}
+                onFailure={responseGoogle}
+                cookiePolicy={"single_host_origin"}
+              />
+
               <form onSubmit={handleSubmit}>
                 {error && (
                   <div
@@ -140,9 +171,18 @@ function Login() {
               <p className="sgntrm145">
                 Hoặc <a href="/">Quên mật khẩu</a>.
               </p>
-              <p className="mb-0 mt-30 hvsng145">
-                Bạn chưa có tài khoản? <Link to="/signup">Đăng ký</Link>
-              </p>
+              {redirectTo && (
+                <p className="mb-0 mt-30 hvsng145">
+                  Bạn chưa có tài khoản?{" "}
+                  <Link to={`/signup?redirectTo=${redirectTo}`}>Đăng ký</Link>
+                </p>
+              )}
+              {!redirectTo && (
+                <p className="mb-0 mt-30 hvsng145">
+                  Bạn chưa có tài khoản?{" "}
+                  <Link to="/signup">Đăng ký</Link>
+                </p>
+              )}
             </div>
           </div>
         </div>

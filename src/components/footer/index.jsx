@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import CreateClass from '../../views/classes/create';
 
 function Footer() {
     return (
       <footer className="footer mt-30">
+        <CreateClass />
+
         <div className="container">
           <div className="row">
             <div className="col-lg-4 col-md-3 col-sm-6">

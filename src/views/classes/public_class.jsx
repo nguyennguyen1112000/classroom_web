@@ -1,4 +1,3 @@
-import { useTheme } from "@material-ui/core";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +8,7 @@ import MapStudentModal from "../../components/modal/map-student";
 import { authHeader, logOut } from "../../helper/utils";
 import { addUserToClass } from "../../services/api/class";
 
-function PublicClass(props) {
+function PublicClass() {
   const API_URL = process.env.REACT_APP_API_URL;
   const [classroom, setClassroom] = useState();
   const [existed, setExisted] = useState(false);
@@ -19,12 +18,9 @@ function PublicClass(props) {
 
   let { code } = useParams();
   const search = useLocation().search;
-  const role = new URLSearchParams(search).get("role");
-  //console.log("code, role", code, role);
-
-  code = Buffer.from(code, "base64").toString();
   const user = useSelector((state) => state.auth.currentUser);
   useEffect(() => {
+    let role = new URLSearchParams(search).get("role");
     const fetchData = async () => {
       try {
         const result = await axios.get(
@@ -37,19 +33,17 @@ function PublicClass(props) {
 
           if (result.data.created_by.id === user.id) setRedirect(true);
           else {
-            if (role) {
-              const userToClass = {
-                userId: user.id,
-                role: role,
-                classroomId: result.data.id,
-              };
-              dispatch(addUserToClass(userToClass));
-            }
+            if (!role) role = "student";
+            const userToClass = {
+              userId: user.id,
+              role: role,
+              classroomId: result.data.id,
+            };
+            dispatch(addUserToClass(userToClass));
           }
         }
       } catch (error) {
         console.log("err", error);
-
         if (error.response.status === 401) {
           const logoutAction = userLogout();
           logOut();
@@ -119,46 +113,6 @@ function PublicClass(props) {
                         </li>
                       </ul>
                     </div>
-                    <div className="col-lg-5">
-                      <div className="eps_dots more_dropdown">
-                        <button className="msg125 btn500">
-                          <span className="vdt14"> Chia sẻ mã lớp</span>
-                          <span>
-                            <i className="uil uil-share-alt" />
-                          </span>
-                        </button>
-                        <div className="dropdown-content">
-                          <span
-                            onClick={() => {
-                              navigator.clipboard.writeText(
-                                classroom ? classroom.code : ""
-                              );
-                            }}
-                          >
-                            <i className="uil uil-copy-alt" />
-                            Sao chép mã lớp
-                          </span>
-                          <span
-                            onClick={() => {
-                              navigator.clipboard.writeText(
-                                classroom
-                                  ? `${API_URL}/classrooms/${Buffer.from(
-                                      classroom.code
-                                    ).toString("base64")}`
-                                  : ""
-                              );
-                            }}
-                          >
-                            <i className="uil uil-link-alt" />
-                            Sao chép đường liên kết
-                          </span>
-                          <span>
-                            <i className="uil uil-envelope-share"></i>
-                            Mời thành viên
-                          </span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -196,16 +150,7 @@ function PublicClass(props) {
                       >
                         Thành viên
                       </a>
-                      <a
-                        className="nav-item nav-link"
-                        id="nav-reviews-tab"
-                        data-toggle="tab"
-                        href="#nav-reviews"
-                        role="tab"
-                        aria-selected="false"
-                      >
-                        Discussion
-                      </a>
+
                     </div>
                   </nav>
                 </div>
@@ -216,7 +161,7 @@ function PublicClass(props) {
         <MapStudentModal
           userId={user && user.id}
           classroomId={classroom && classroom.id}
-          handleUpdate = {handleClick}
+          handleUpdate={handleClick}
         />
         <div className="_215b17">
           <div className="container">
@@ -376,7 +321,7 @@ function PublicClass(props) {
                                       <div className="tutor_cate">
                                         {stu.user.email}
                                       </div>
-                                      {user.email == stu.user.email &&
+                                      {user.email === stu.user.email &&
                                         stu.studentId === null && (
                                           <button
                                             className="live_link"
@@ -386,7 +331,19 @@ function PublicClass(props) {
                                             Cập nhật MSSV
                                           </button>
                                         )}
-                                      {user.email == stu.user.email &&
+                                      {user.email !== stu.user.email &&
+                                        stu.studentId && (
+                                          <div className="tutor_cate">
+                                            {stu.studentId}
+                                          </div>
+                                        )}
+                                      {user.email !== stu.user.email &&
+                                        stu.studentId === null && (
+                                          <div className="tutor_cate">
+                                            Chưa cập nhật MSSV
+                                          </div>
+                                        )}
+                                      {user.email === stu.user.email &&
                                         stu.studentId && (
                                           <div className="tutor_cate">
                                             {stu.studentId}
@@ -399,13 +356,6 @@ function PublicClass(props) {
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div
-                      className="tab-pane fade"
-                      id="nav-reviews"
-                      role="tabpanel"
-                    >
-                      fsd
                     </div>
                   </div>
                 </div>

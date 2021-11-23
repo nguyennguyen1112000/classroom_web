@@ -5,7 +5,7 @@ import Header from "./components/header";
 import VerticalNav from "./components/vertical-nav";
 import CreateClass from "./views/classes/create";
 import Setting from "./views/setting/profile";
-import { BrowserRouter as Router} from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import PublicRoute from "./router/publicRoute";
 import PrivateRoute from "./router/privateRoute";
 import ClassList from "./views/classes/list";
@@ -28,13 +28,25 @@ function App() {
           exact
         />
         <PublicRoute
-          restricted={true}
+          restricted={false}
           component={Register}
           path="/signup"
           exact
         />
         <PrivateRoute component={CreateClass} path="/my-classes/create" exact />
-        <PrivateRoute component={ClassList} path="/" exact />
+        <PrivateRoute component={ClassList} isMyClasses={true} path="/" exact />
+        <PrivateRoute
+          component={ClassList}
+          isMyClasses={true}
+          path="/my-classes"
+          exact
+        />
+        <PrivateRoute
+          component={ClassList}
+          isMyJoinedClasses={true}
+          path="/joined-classes"
+          exact
+        />
         <PrivateRoute component={DetailClass} path="/my-classes/:code" exact />
         <PrivateRoute component={PublicClass} path="/classrooms/:code" exact />
         <PrivateRoute component={Setting} path="/setting" exact />
