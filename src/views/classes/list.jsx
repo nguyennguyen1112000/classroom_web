@@ -15,15 +15,14 @@ ClassList.defaultProps = {
 
 function ClassList(props) {
   const { isMyClasses, isMyJoinedClasses } = props;
-  console.log("props", isMyClasses, isMyJoinedClasses);
 
   const dispatch = useDispatch();
   useEffect(() => {
     if (isMyClasses) dispatch(getAll());
-    else if(isMyJoinedClasses) {
+    else if (isMyJoinedClasses) {
       dispatch(getAllJoinedClasses());
     }
-  }, [dispatch]);
+  }, [dispatch, isMyClasses, isMyJoinedClasses]);
   const classList = useSelector((state) =>
     isMyClasses ? state.class.classList : state.class.joinedClasses
   );
@@ -59,7 +58,7 @@ function ClassList(props) {
                         code={obj.code}
                         name={obj.name}
                         topic={obj.topic}
-                        isMyClasses = {isMyClasses}
+                        isMyClasses={isMyClasses}
                       />
                     );
                   })}

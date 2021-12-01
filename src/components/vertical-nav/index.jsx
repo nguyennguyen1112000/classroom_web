@@ -47,36 +47,7 @@ function VerticalNav(props) {
                   <span className="menu--label">Lớp học của tôi</span>
                 </Link>
               </li>
-              <li className="menu--item">
-                <label className="menu--link" title="Tests">
-                  <i className="uil uil-clipboard-alt menu--icon" />
-                  <span className="menu--label">Tạo bài tập</span>
-                </label>
-              </li>
 
-              <li className="menu--item  menu--item__has_sub_menu">
-                <label className="menu--link" title="Pages">
-                  <i className="uil uil-file menu--icon" />
-                  <span className="menu--label">Điểm số</span>
-                </label>
-                <ul className="sub_menu">
-                  <li className="sub_menu--item">
-                    <Link to="/" className="sub_menu--link">
-                      Phân chia điểm bài tập
-                    </Link>
-                  </li>
-                  <li className="sub_menu--item">
-                    <Link to="/" className="sub_menu--link">
-                      Nhập điểm
-                    </Link>
-                  </li>
-                  <li className="sub_menu--item">
-                    <Link to="/" className="sub_menu--link">
-                      Xem báo cáo điểm
-                    </Link>
-                  </li>
-                </ul>
-              </li>
             </ul>
           </div>
 

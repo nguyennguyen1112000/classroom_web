@@ -60,8 +60,7 @@ function MapStudentModal(props) {
   }
   return (
     <div
-      className="course_tabs_1"
-      className="modal fade"
+      className="course_tabs_1 modal fade"
       id="mapStudentId"
       tabIndex="-1"
       role="dialog"

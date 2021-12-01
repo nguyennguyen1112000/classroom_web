@@ -6,7 +6,9 @@ import { userLogout } from "../../actions/auth";
 import Footer from "../../components/footer";
 import InviteUserModal from "../../components/modal/invite-user";
 import { authHeader, logOut } from "../../helper/utils";
-
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import PointStructureItem from "../../components/drag-item/point-structure-item";
 function DetailClass() {
   const API_URL = process.env.REACT_APP_API_URL;
   const PUBLIC_URL = process.env.REACT_APP_PUBLIC_URL;
@@ -17,6 +19,7 @@ function DetailClass() {
   const dispatch = useDispatch();
   let { code } = useParams();
   const user = useSelector((state) => state.auth.currentUser);
+  const [cards, setCards] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,9 +27,12 @@ function DetailClass() {
         const result = await axios.get(
           `${API_URL}/classrooms/code/${code}`,
           authHeader()
-        );       
+        );
         if (result.data.created_by.id !== user.id) setRedirect(true);
-        else setClassroom(result.data);
+        else {
+          setClassroom(result.data);
+          setCards(result.data.pointStructures);
+        }
       } catch (error) {
         if (error.response.status === 401) {
           const logoutAction = userLogout();
@@ -36,7 +42,7 @@ function DetailClass() {
       }
     };
     fetchData();
-  }, []);
+  }, [API_URL, code, dispatch, user.id]);
   function formatDate(date) {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }
@@ -48,6 +54,92 @@ function DetailClass() {
     setModalId("inviteStudents");
     setRole("student");
   }
+  const moveCard = (dragIndex, hoverIndex) => {
+    const dragCard = cards[dragIndex];
+    const dragOrder = dragCard.order;
+    let newCards = [...cards];
+    newCards[dragIndex] = newCards[hoverIndex];
+    newCards[hoverIndex] = dragCard;
+    newCards[hoverIndex].order = newCards[dragIndex].order;
+    newCards[dragIndex].order = dragOrder;
+    if (!newCards[dragIndex].isNew)
+      axios
+        .patch(
+          `${API_URL}/point-structure/${newCards[dragIndex].id}`,
+          newCards[dragIndex],
+          authHeader()
+        )
+        .then((res) => {})
+        .catch((err) => {
+          if (err.response.status === 401) {
+            const logoutAction = userLogout();
+            logOut();
+            dispatch(logoutAction);
+          }
+          console.log("Error", err);
+        });
+    if (!newCards[hoverIndex].isNew)
+      axios
+        .patch(
+          `${API_URL}/point-structure/${newCards[hoverIndex].id}`,
+          newCards[hoverIndex],
+          authHeader()
+        )
+        .then((res) => {})
+        .catch((err) => {
+          if (err.response.status === 401) {
+            const logoutAction = userLogout();
+            logOut();
+            dispatch(logoutAction);
+          }
+          console.log("Error", err);
+        });
+    setCards(newCards);
+  };
+  const renderCard = (card, index) => {
+    return (
+      <PointStructureItem
+        key={card.id}
+        index={index}
+        id={card.id}
+        title={card.title}
+        point={card.point}
+        moveCard={moveCard}
+        updateCards={updateCard}
+        removeCard={removeCard}
+        isEdit={card.isEdit ? true : false}
+        isNew={card.isNew ? true : false}
+        classroomId={classroom && classroom.id}
+        order={card.order}
+      />
+    );
+  };
+  const handleClickAdd = () => {
+    const nextId = Math.max(...cards.map((card) => card.id)) + 1;
+    const nextOrder = Math.max(...cards.map((card) => card.order)) + 1;
+    setCards([
+      ...cards,
+      {
+        id: nextId,
+        title: "",
+        point: 0,
+        isNew: true,
+        isEdit: true,
+        order: nextOrder,
+      },
+    ]);
+  };
+  const updateCard = (id, newCard) => {
+    const index = cards.findIndex((card) => card.id === id);
+    let newCards = [...cards];
+    newCards[index] = newCard;
+    setCards(newCards);
+  };
+  const removeCard = (id) => {
+    const index = cards.findIndex((card) => card.id === id);
+    let newCards = [...cards.slice(0, index), ...cards.slice(index + 1)];
+    setCards(newCards);
+  };
   if (redirect)
     return (
       <div className="wrapper coming_soon_wrapper">
@@ -57,7 +149,7 @@ function DetailClass() {
               <div className="cmtk_group">
                 <div className="ct-logo">
                   <a href="index.html">
-                    <img src="images/ct_logo.svg" alt="" />
+                    <img src="images/ct_logo.svg" alt="logo" />
                   </a>
                 </div>
                 <div className="cmtk_dt">
@@ -195,6 +287,16 @@ function DetailClass() {
                       >
                         Thành viên
                       </a>
+                      <a
+                        className="nav-item nav-link"
+                        id="nav-point-structure-tab"
+                        data-toggle="tab"
+                        href="#nav-point-structure"
+                        role="tab"
+                        aria-selected="false"
+                      >
+                        Cấu trúc điểm
+                      </a>
                     </div>
                   </nav>
                 </div>
@@ -226,6 +328,7 @@ function DetailClass() {
                                 <div className="img160">
                                   <img
                                     src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
+                                    alt="avatar"
                                   />
                                 </div>
                                 <textarea
@@ -253,7 +356,7 @@ function DetailClass() {
                           <a
                             className="option_links"
                             title="Messages"
-                            href="#"
+                            href="/"
                             data-toggle="modal"
                             data-target={`#${modalId}`}
                             onClick={handleClickTeachers}
@@ -270,7 +373,7 @@ function DetailClass() {
                             >
                               <div className="fcrse_1 mt-30">
                                 <div className="tutor_img">
-                                  <a href="#">
+                                  <a href="/">
                                     <img
                                       src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
                                       alt="owner"
@@ -309,7 +412,7 @@ function DetailClass() {
                                       <a href="instructor_profile_view.html">
                                         <img
                                           src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                          alt=""
+                                          alt="teacher"
                                         />
                                       </a>
                                     </div>
@@ -342,7 +445,7 @@ function DetailClass() {
                           <a
                             className="option_links"
                             title="Messages"
-                            href="#"
+                            href="/"
                             data-toggle="modal"
                             data-target={`#${modalId}`}
                             onClick={handleClickStudents}
@@ -361,10 +464,10 @@ function DetailClass() {
                                 >
                                   <div className="fcrse_1 mt-30">
                                     <div className="tutor_img">
-                                      <a href="#">
+                                      <a href="/">
                                         <img
                                           src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                          alt=""
+                                          alt="student"
                                         />
                                       </a>
                                     </div>
@@ -402,7 +505,47 @@ function DetailClass() {
                         </div>
                       </div>
                     </div>
-  
+                    <div
+                      className="tab-pane fade"
+                      id="nav-point-structure"
+                      role="tabpanel"
+                    >
+                      <div>
+                        <div className="curriculum-section">
+                          <div className="row">
+                            <div className="col-md-12">
+                              <div className="added-section-item mb-30">
+                                <div className="section-header">
+                                  <h4>
+                                    <i className="fas fa-bars mr-2" />
+                                    Chi tiết các mục điểm
+                                  </h4>
+                                </div>
+
+                                <div className="section-group-list">
+                                  <DndProvider backend={HTML5Backend}>
+                                    <div>
+                                      {cards.map((card, i) =>
+                                        renderCard(card, i)
+                                      )}
+                                    </div>
+                                  </DndProvider>
+                                </div>
+                                <div className="section-add-item-wrap p-3">
+                                  <button
+                                    className="add_lecture"
+                                    onClick={handleClickAdd}
+                                  >
+                                    <i className="far fa-plus-square mr-2" />
+                                    Thêm mục mới
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

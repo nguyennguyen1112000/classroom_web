@@ -27,7 +27,7 @@ function InviteUserModal(props) {
     event.preventDefault();
     if (emails.length > 0) {
       for (let i = 0; i < emails.length; i++) {
-        const result = axios
+        axios
           .post(
             `${API_URL}/classrooms/invite/${classroomId}`,
             {
@@ -57,8 +57,7 @@ function InviteUserModal(props) {
   }
   return (
     <div
-      className="course_tabs_1"
-      className="modal fade"
+      className="course_tabs_1 modal fade"
       id={modalId}
       tabIndex="-1"
       role="dialog"

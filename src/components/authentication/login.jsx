@@ -21,7 +21,6 @@ function Login() {
   const redirectTo = new URLSearchParams(search).get("redirectTo");
 
   const responseGoogle = (response) => {
-    console.log(response);
     if (response.profileObj) {
       const { email, googleId, familyName, givenName } = response.profileObj;
       const input = {
@@ -33,7 +32,6 @@ function Login() {
       axios
         .post(`${API_URL}/google`, input)
         .then((res) => {
-          console.log("Login successfully", res);
           const { access_token, user } = res.data;
           localStorage.setItem("user", JSON.stringify(user));
           localStorage.setItem("token", JSON.stringify(access_token));
@@ -71,7 +69,7 @@ function Login() {
     axios
       .post(`${API_URL}/auth/login`, input)
       .then((res) => {
-        const { access_token, user } = res.data;
+        const { access_token, user } = res.data;        
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", JSON.stringify(access_token));
         const action = userLoginSuccess(user);

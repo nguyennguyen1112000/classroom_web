@@ -76,8 +76,7 @@ function CreateClass() {
 
   return (
     <div
-      className="course_tabs_1"
-      className="modal fade"
+      className="course_tabs_1 modal fade"
       id="createClass"
       tabIndex="-1"
       role="dialog"
@@ -96,7 +95,7 @@ function CreateClass() {
               className="close"
               data-dismiss="modal"
               aria-label="Close"
-              id= "close-create-modal"
+              id="close-create-modal"
             >
               <span aria-hidden="true">×</span>
             </button>

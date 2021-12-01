@@ -4008,7 +4008,29 @@ a.rmv-btn:hover {
     background: #333;
 }
 
-a.rmv-btn i {
+a.rmv-btn i{
+    margin-right: 3px;
+}
+
+a.add-btn {
+    font-size: 14px;
+    margin-top: 30px;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+    color: #fff;
+    display: block;
+    background: #268ded;
+    border-radius: 3px;
+    text-align: center;
+    padding: 10px 0;
+}
+
+a.add-btn:hover {
+    color: #fff !important;
+    background: #333;
+}
+
+a.add-btn i{
     margin-right: 3px;
 }
 

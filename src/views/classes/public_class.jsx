@@ -1,8 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, useLocation, useParams } from "react-router";
 import { userLogout } from "../../actions/auth";
+import PointStructureItem from "../../components/drag-item/point-structure-item";
 import Footer from "../../components/footer";
 import MapStudentModal from "../../components/modal/map-student";
 import { authHeader, logOut } from "../../helper/utils";
@@ -14,6 +17,8 @@ function PublicClass() {
   const [existed, setExisted] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const [updateStudentId, setUpdateStudentId] = useState(false);
+  const [isTeacher, setIsTeacher] = useState(false);
+  const [cards, setCards] = useState([]);
   const dispatch = useDispatch();
 
   let { code } = useParams();
@@ -30,10 +35,16 @@ function PublicClass() {
         if (result.data) {
           setExisted(true);
           setClassroom(result.data);
+          const isTeacher =
+            result.data.teachers.length > 0 &&
+            result.data.teachers.some((teacher) => teacher.user.id === user.id);
+          setIsTeacher(isTeacher);
+          setCards(result.data.pointStructures);
 
           if (result.data.created_by.id === user.id) setRedirect(true);
           else {
             if (!role) role = "student";
+
             const userToClass = {
               userId: user.id,
               role: role,
@@ -44,15 +55,15 @@ function PublicClass() {
         }
       } catch (error) {
         console.log("err", error);
-        if (error.response.status === 401) {
-          const logoutAction = userLogout();
-          logOut();
-          dispatch(logoutAction);
-        }
+        // if (error.response.status === 401) {
+        //   const logoutAction = userLogout();
+        //   logOut();
+        //   dispatch(logoutAction);
+        // }
       }
     };
     fetchData();
-  }, [updateStudentId]);
+  }, [updateStudentId, API_URL, code, dispatch, search, user.id]);
   function handleClick() {
     setUpdateStudentId(true);
   }
@@ -60,6 +71,77 @@ function PublicClass() {
   function formatDate(date) {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }
+  const moveCard = (dragIndex, hoverIndex) => {
+    const dragCard = cards[dragIndex];
+    const dragOrder = dragCard.order;
+    let newCards = [...cards];
+    newCards[dragIndex] = newCards[hoverIndex];
+    newCards[hoverIndex] = dragCard;
+    newCards[hoverIndex].order = newCards[dragIndex].order;
+    newCards[dragIndex].order = dragOrder;
+    if (!newCards[dragIndex].isNew)
+      axios
+        .patch(
+          `${API_URL}/point-structure/${newCards[dragIndex].id}`,
+          newCards[dragIndex],
+          authHeader()
+        )
+        .then((res) => {})
+        .catch((err) => {
+          if (err.response.status === 401) {
+            const logoutAction = userLogout();
+            logOut();
+            dispatch(logoutAction);
+          }
+          console.log("Error", err);
+        });
+    if (!newCards[hoverIndex].isNew)
+      axios
+        .patch(
+          `${API_URL}/point-structure/${newCards[hoverIndex].id}`,
+          newCards[hoverIndex],
+          authHeader()
+        )
+        .then((res) => {})
+        .catch((err) => {
+          if (err.response.status === 401) {
+            const logoutAction = userLogout();
+            logOut();
+            dispatch(logoutAction);
+          }
+          console.log("Error", err);
+        });
+    setCards(newCards);
+  };
+  const updateCard = (id, newCard) => {
+    const index = cards.findIndex((card) => card.id === id);
+    let newCards = [...cards];
+    newCards[index] = newCard;
+    setCards(newCards);
+  };
+  const removeCard = (id) => {
+    const index = cards.findIndex((card) => card.id === id);
+    let newCards = [...cards.slice(0, index), ...cards.slice(index + 1)];
+    setCards(newCards);
+  };
+  const renderCard = (card, index) => {
+    return (
+      <PointStructureItem
+        key={card.id}
+        index={index}
+        id={card.id}
+        title={card.title}
+        point={card.point}
+        moveCard={moveCard}
+        updateCards={updateCard}
+        removeCard={removeCard}
+        isEdit={card.isEdit ? true : false}
+        isNew={card.isNew ? true : false}
+        classroomId={classroom && classroom.id}
+        order={card.order}
+      />
+    );
+  };
   if (redirect) {
     return <Redirect to={`/my-classes/${classroom.code}`} />;
   }
@@ -150,7 +232,16 @@ function PublicClass() {
                       >
                         Thành viên
                       </a>
-
+                      <a
+                        className="nav-item nav-link"
+                        id="nav-point-structure-tab"
+                        data-toggle="tab"
+                        href="#nav-point-structure"
+                        role="tab"
+                        aria-selected="false"
+                      >
+                        Cấu trúc điểm
+                      </a>
                     </div>
                   </nav>
                 </div>
@@ -187,6 +278,7 @@ function PublicClass() {
                                 <div className="img160">
                                   <img
                                     src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
+                                    alt="avatar"
                                   />
                                 </div>
                                 <textarea
@@ -219,7 +311,7 @@ function PublicClass() {
                             >
                               <div className="fcrse_1 mt-30">
                                 <div className="tutor_img">
-                                  <a href="#">
+                                  <a href="/">
                                     <img
                                       src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
                                       alt=""
@@ -298,7 +390,7 @@ function PublicClass() {
                                 >
                                   <div className="fcrse_1 mt-30">
                                     <div className="tutor_img">
-                                      <a href="#">
+                                      <a href="/">
                                         <img
                                           src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
                                           alt=""
@@ -353,6 +445,81 @@ function PublicClass() {
                                   </div>
                                 </div>
                               ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="tab-pane fade"
+                      id="nav-point-structure"
+                      role="tabpanel"
+                    >
+                      <div>
+                        <div className="curriculum-section">
+                          <div className="row">
+                            <div className="col-md-12">
+                              <div className="added-section-item mb-30">
+                                <div className="section-header">
+                                  <h4>
+                                    <i className="fas fa-bars mr-2" />
+                                    Chi tiết các mục điểm
+                                  </h4>
+                                </div>
+
+                                <div className="section-group-list">
+                                  {classroom && isTeacher && (
+                                    <DndProvider backend={HTML5Backend}>
+                                      <div>
+                                        {cards.map((card, i) =>
+                                          renderCard(card, i)
+                                        )}
+                                      </div>
+                                    </DndProvider>
+                                  )}
+                                  {classroom && !isTeacher && (
+                                    <div className="table-responsive">
+                                      <table
+                                        className="table ucp-table"
+                                        id="content-table"
+                                      >
+                                        <thead className="thead-s">
+                                          <tr>
+                                            <th
+                                              className="text-center"
+                                              scope="col"
+                                            >
+                                              STT
+                                            </th>
+                                            <th scope="col">Tên cột điểm</th>
+                                            <th
+                                              className="text-center"
+                                              scope="col"
+                                            >
+                                              Điểm
+                                            </th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {cards.map((card, index) => (
+                                            <tr key={index}>
+                                              <td className="text-center">
+                                                {index + 1}
+                                              </td>
+                                              <td className="cell-ta">
+                                                {card.title}
+                                              </td>
+                                              <td className="text-center">
+                                                {card.point}
+                                              </td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

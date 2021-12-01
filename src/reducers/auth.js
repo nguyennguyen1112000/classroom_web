@@ -2,7 +2,6 @@ import { LOGIN_FAIL, LOGIN_SUCCESS, LOGOUT, UPDATE_PROFILE } from "../actions/ty
 
 
 const user = JSON.parse(localStorage.getItem("user"));
-console.log(JSON.parse(localStorage.getItem("token")));
 const authReducerInitialState = user
   ? {
       currentUser: user,
