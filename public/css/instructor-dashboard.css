@@ -1686,7 +1686,7 @@ i.icon1 {
 
 .my_crse_nav .nav-item {
 	text-align: center;
-    width: 20%;
+    width: calc(100% / 3);
 }
 
 .my_crse_nav {

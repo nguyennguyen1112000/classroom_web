@@ -9,6 +9,8 @@ import { authHeader, logOut } from "../../helper/utils";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import PointStructureItem from "../../components/drag-item/point-structure-item";
+import { toast } from "react-toastify";
+import ManagePoints from "../../components/manage-point";
 function DetailClass() {
   const API_URL = process.env.REACT_APP_API_URL;
   const PUBLIC_URL = process.env.REACT_APP_PUBLIC_URL;
@@ -20,6 +22,8 @@ function DetailClass() {
   let { code } = useParams();
   const user = useSelector((state) => state.auth.currentUser);
   const [cards, setCards] = useState([]);
+  const [reload, setReload] = useState(false);
+  const [studentList, setStudentList] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,6 +36,13 @@ function DetailClass() {
         else {
           setClassroom(result.data);
           setCards(result.data.pointStructures);
+          if (result.data.studentsFile) {
+            const students = await axios.get(
+              `${API_URL}/file/studentList/${result.data.id}`,
+              authHeader()
+            );
+            setStudentList(students.data);
+          }
         }
       } catch (error) {
         if (error.response.status === 401) {
@@ -42,10 +53,14 @@ function DetailClass() {
       }
     };
     fetchData();
-  }, [API_URL, code, dispatch, user.id]);
+  }, [API_URL, code, dispatch, user.id, reload]);
+
+  /***********************Format*************/
   function formatDate(date) {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }
+
+  /***************** Handle click *********************/
   function handleClickTeachers(event) {
     setModalId("inviteTeachers");
     setRole("teacher");
@@ -197,7 +212,7 @@ function DetailClass() {
                           <div className="_ttl121">
                             <div className="_ttl122">Số giảng viên</div>
                             <div className="_ttl123">
-                              {classroom && 1 + classroom.teachers.length}
+                              {classroom && classroom.teachers.length}
                             </div>
                           </div>
                         </li>
@@ -297,6 +312,16 @@ function DetailClass() {
                       >
                         Cấu trúc điểm
                       </a>
+                      <a
+                        className="nav-item nav-link"
+                        id="nav-point-detail-tab"
+                        data-toggle="tab"
+                        href="#nav-point-detail"
+                        role="tab"
+                        aria-selected="false"
+                      >
+                        Điểm số
+                      </a>
                     </div>
                   </nav>
                 </div>
@@ -367,40 +392,6 @@ function DetailClass() {
 
                         <div className="_14d25">
                           <div className="row">
-                            <div
-                              className="col-lg-3 col-md-4"
-                              key={classroom && classroom.created_by.id}
-                            >
-                              <div className="fcrse_1 mt-30">
-                                <div className="tutor_img">
-                                  <a href="/">
-                                    <img
-                                      src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                      alt="owner"
-                                    />
-                                  </a>
-                                </div>
-                                <div className="tutor_content_dt">
-                                  <div className="tutor150">
-                                    <a
-                                      href="instructor_profile_view.html"
-                                      className="tutor_name"
-                                    >
-                                      {classroom &&
-                                        classroom.created_by.firstName}{" "}
-                                      {classroom &&
-                                        classroom.created_by.lastName}
-                                    </a>
-                                    <div className="mef78" title="Verify">
-                                      <i className="uil uil-check-circle" />
-                                    </div>
-                                  </div>
-                                  <div className="tutor_cate">
-                                    {classroom && classroom.created_by.email}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
                             {classroom &&
                               classroom.teachers.map((teacher) => (
                                 <div
@@ -408,14 +399,6 @@ function DetailClass() {
                                   key={teacher.user.id}
                                 >
                                   <div className="fcrse_1 mt-30">
-                                    <div className="tutor_img">
-                                      <a href="instructor_profile_view.html">
-                                        <img
-                                          src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                          alt="teacher"
-                                        />
-                                      </a>
-                                    </div>
                                     <div className="tutor_content_dt">
                                       <div className="tutor150">
                                         <a
@@ -425,9 +408,6 @@ function DetailClass() {
                                           {teacher.user.firstName}{" "}
                                           {teacher.user.lastName}
                                         </a>
-                                        <div className="mef78" title="Verify">
-                                          <i className="uil uil-check-circle" />
-                                        </div>
                                       </div>
                                       <div className="tutor_cate">
                                         {teacher.user.email}
@@ -463,14 +443,6 @@ function DetailClass() {
                                   key={stu.user.id}
                                 >
                                   <div className="fcrse_1 mt-30">
-                                    <div className="tutor_img">
-                                      <a href="/">
-                                        <img
-                                          src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                          alt="student"
-                                        />
-                                      </a>
-                                    </div>
                                     <div className="tutor_content_dt">
                                       <div className="tutor150">
                                         <a
@@ -480,9 +452,6 @@ function DetailClass() {
                                           {stu.user.firstName}{" "}
                                           {stu.user.lastName}
                                         </a>
-                                        <div className="mef78" title="Verify">
-                                          <i className="uil uil-check-circle" />
-                                        </div>
                                       </div>
                                       <div className="tutor_cate">
                                         {stu.user.email}
@@ -545,6 +514,13 @@ function DetailClass() {
                           </div>
                         </div>
                       </div>
+                    </div>
+                    <div
+                      className="tab-pane fade"
+                      id="nav-point-detail"
+                      role="tabpanel"
+                    >
+                     <ManagePoints cards={cards} classroom={classroom} studentList={studentList} reload={reload} setReload={setReload} setStudentList={setStudentList} setCards={setCards}/>
                     </div>
                   </div>
                 </div>

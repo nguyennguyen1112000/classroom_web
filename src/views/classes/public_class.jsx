@@ -7,7 +7,7 @@ import { Redirect, useLocation, useParams } from "react-router";
 import { userLogout } from "../../actions/auth";
 import PointStructureItem from "../../components/drag-item/point-structure-item";
 import Footer from "../../components/footer";
-import MapStudentModal from "../../components/modal/map-student";
+import ManagePoints from "../../components/manage-point";
 import { authHeader, logOut } from "../../helper/utils";
 import { addUserToClass } from "../../services/api/class";
 
@@ -16,9 +16,11 @@ function PublicClass() {
   const [classroom, setClassroom] = useState();
   const [existed, setExisted] = useState(false);
   const [redirect, setRedirect] = useState(false);
-  const [updateStudentId, setUpdateStudentId] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
   const [cards, setCards] = useState([]);
+  const [point, setPoint] = useState([]);
+  const [studentList, setStudentList] = useState([]);
+  const [reload, setReload] = useState(false);
   const dispatch = useDispatch();
 
   let { code } = useParams();
@@ -33,14 +35,6 @@ function PublicClass() {
           authHeader()
         );
         if (result.data) {
-          setExisted(true);
-          setClassroom(result.data);
-          const isTeacher =
-            result.data.teachers.length > 0 &&
-            result.data.teachers.some((teacher) => teacher.user.id === user.id);
-          setIsTeacher(isTeacher);
-          setCards(result.data.pointStructures);
-
           if (result.data.created_by.id === user.id) setRedirect(true);
           else {
             if (!role) role = "student";
@@ -51,26 +45,85 @@ function PublicClass() {
               classroomId: result.data.id,
             };
             dispatch(addUserToClass(userToClass));
+            if (user.studentId) {
+              const pointData = await axios.get(
+                `${API_URL}/student-to-assignment/myPoints/${result.data.id}`,
+                authHeader()
+              );
+              setPoint(pointData.data);
+            }
+          }
+          setExisted(true);
+          setClassroom(result.data);
+
+          const teacher =
+            result.data.teachers.length > 0 &&
+            result.data.teachers.some((teacher) => teacher.user.id === user.id);
+          setIsTeacher(teacher);
+          setCards(result.data.pointStructures);
+          if (teacher) {
+            if (result.data.studentsFile) {
+              const students = await axios.get(
+                `${API_URL}/file/studentList/${result.data.id}`,
+                authHeader()
+              );
+              setStudentList(students.data);
+            }
           }
         }
       } catch (error) {
         console.log("err", error);
-        // if (error.response.status === 401) {
-        //   const logoutAction = userLogout();
-        //   logOut();
-        //   dispatch(logoutAction);
-        // }
+        if (error.response.status === 401) {
+          const logoutAction = userLogout();
+          logOut();
+          dispatch(logoutAction);
+        }
       }
     };
     fetchData();
-  }, [updateStudentId, API_URL, code, dispatch, search, user.id]);
-  function handleClick() {
-    setUpdateStudentId(true);
-  }
+  }, [ API_URL, code, dispatch, search, user.id]);
+  // function handleClick() {
+  //   setUpdateStudentId(true);
+  // }
 
   function formatDate(date) {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }
+  const renderPoint = () => {
+    console.log("user", user);
+
+    if (user && user.studentId)
+      return (
+        <table className="table ucp-table">
+          <thead className="thead-s">
+            <tr>
+              <th>MSSV</th>
+              <th>Họ và tên</th>
+              {cards &&
+                cards.map((card) => <th key={card.id}>{card.title}</th>)}
+              <th>Tổng kết</th>
+            </tr>
+          </thead>
+          <tbody>
+            {user && (
+              <tr>
+                <td>{user.studentId}</td>
+                <td>
+                  {user.firstName} {user.lastName}
+                </td>
+                {point &&
+                  point.map((p) => (
+                    <td>
+                      <b className="course_active">{p.detailPoint}</b>
+                    </td>
+                  ))}
+              </tr>
+            )}
+          </tbody>
+        </table>
+      );
+    return <div>Vui lòng cập nhật MSSV để coi điểm</div>;
+  };
   const moveCard = (dragIndex, hoverIndex) => {
     const dragCard = cards[dragIndex];
     const dragOrder = dragCard.order;
@@ -112,6 +165,21 @@ function PublicClass() {
           console.log("Error", err);
         });
     setCards(newCards);
+  };
+  const handleClickAdd = () => {
+    const nextId = Math.max(...cards.map((card) => card.id)) + 1;
+    const nextOrder = Math.max(...cards.map((card) => card.order)) + 1;
+    setCards([
+      ...cards,
+      {
+        id: nextId,
+        title: "",
+        point: 0,
+        isNew: true,
+        isEdit: true,
+        order: nextOrder,
+      },
+    ]);
   };
   const updateCard = (id, newCard) => {
     const index = cards.findIndex((card) => card.id === id);
@@ -172,7 +240,7 @@ function PublicClass() {
                           <div className="_ttl121">
                             <div className="_ttl122">Số giảng viên</div>
                             <div className="_ttl123">
-                              {classroom && 1 + classroom.teachers.length}
+                              {classroom && classroom.teachers.length}
                             </div>
                           </div>
                         </li>
@@ -242,6 +310,16 @@ function PublicClass() {
                       >
                         Cấu trúc điểm
                       </a>
+                      <a
+                        className="nav-item nav-link"
+                        id="nav-point-detail-tab"
+                        data-toggle="tab"
+                        href="#nav-point-detail"
+                        role="tab"
+                        aria-selected="false"
+                      >
+                        Điểm số
+                      </a>
                     </div>
                   </nav>
                 </div>
@@ -249,11 +327,7 @@ function PublicClass() {
             </div>
           </div>
         </div>
-        <MapStudentModal
-          userId={user && user.id}
-          classroomId={classroom && classroom.id}
-          handleUpdate={handleClick}
-        />
+
         <div className="_215b17">
           <div className="container">
             <div className="row">
@@ -305,40 +379,6 @@ function PublicClass() {
 
                         <div className="_14d25">
                           <div className="row">
-                            <div
-                              className="col-lg-3 col-md-4"
-                              key={classroom && classroom.created_by.id}
-                            >
-                              <div className="fcrse_1 mt-30">
-                                <div className="tutor_img">
-                                  <a href="/">
-                                    <img
-                                      src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                      alt=""
-                                    />
-                                  </a>
-                                </div>
-                                <div className="tutor_content_dt">
-                                  <div className="tutor150">
-                                    <a
-                                      href="instructor_profile_view.html"
-                                      className="tutor_name"
-                                    >
-                                      {classroom &&
-                                        classroom.created_by.firstName}{" "}
-                                      {classroom &&
-                                        classroom.created_by.lastName}
-                                    </a>
-                                    <div className="mef78" title="Verify">
-                                      <i className="uil uil-check-circle" />
-                                    </div>
-                                  </div>
-                                  <div className="tutor_cate">
-                                    {classroom && classroom.created_by.email}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
                             {classroom &&
                               classroom.teachers.map((teacher) => (
                                 <div
@@ -346,14 +386,6 @@ function PublicClass() {
                                   key={teacher.user.id}
                                 >
                                   <div className="fcrse_1 mt-30">
-                                    <div className="tutor_img">
-                                      <a href="instructor_profile_view.html">
-                                        <img
-                                          src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                          alt=""
-                                        />
-                                      </a>
-                                    </div>
                                     <div className="tutor_content_dt">
                                       <div className="tutor150">
                                         <a
@@ -363,9 +395,6 @@ function PublicClass() {
                                           {teacher.user.firstName}{" "}
                                           {teacher.user.lastName}
                                         </a>
-                                        <div className="mef78" title="Verify">
-                                          <i className="uil uil-check-circle" />
-                                        </div>
                                       </div>
                                       <div className="tutor_cate">
                                         {teacher.user.email}
@@ -389,14 +418,6 @@ function PublicClass() {
                                   key={stu.user.id}
                                 >
                                   <div className="fcrse_1 mt-30">
-                                    <div className="tutor_img">
-                                      <a href="/">
-                                        <img
-                                          src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                          alt=""
-                                        />
-                                      </a>
-                                    </div>
                                     <div className="tutor_content_dt">
                                       <div className="tutor150">
                                         <a
@@ -406,22 +427,15 @@ function PublicClass() {
                                           {stu.user.firstName}{" "}
                                           {stu.user.lastName}
                                         </a>
-                                        <div className="mef78" title="Verify">
-                                          <i className="uil uil-check-circle" />
-                                        </div>
                                       </div>
                                       <div className="tutor_cate">
                                         {stu.user.email}
                                       </div>
                                       {user.email === stu.user.email &&
                                         stu.studentId === null && (
-                                          <button
-                                            className="live_link"
-                                            data-toggle="modal"
-                                            data-target="#mapStudentId"
-                                          >
-                                            Cập nhật MSSV
-                                          </button>
+                                          <div className="tutor_cate">
+                                            Chưa cập nhật MSSV
+                                          </div>
                                         )}
                                       {user.email !== stu.user.email &&
                                         stu.studentId && (
@@ -468,13 +482,24 @@ function PublicClass() {
 
                                 <div className="section-group-list">
                                   {classroom && isTeacher && (
-                                    <DndProvider backend={HTML5Backend}>
-                                      <div>
-                                        {cards.map((card, i) =>
-                                          renderCard(card, i)
-                                        )}
+                                    <>
+                                      <DndProvider backend={HTML5Backend}>
+                                        <div>
+                                          {cards.map((card, i) =>
+                                            renderCard(card, i)
+                                          )}
+                                        </div>
+                                      </DndProvider>
+                                      <div className="section-add-item-wrap p-3">
+                                        <button
+                                          className="add_lecture"
+                                          onClick={handleClickAdd}
+                                        >
+                                          <i className="far fa-plus-square mr-2" />
+                                          Thêm mục mới
+                                        </button>
                                       </div>
-                                    </DndProvider>
+                                    </>
                                   )}
                                   {classroom && !isTeacher && (
                                     <div className="table-responsive">
@@ -518,6 +543,34 @@ function PublicClass() {
                                     </div>
                                   )}
                                 </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="tab-pane fade"
+                      id="nav-point-detail"
+                      role="tabpanel"
+                    >
+                      <div>
+                        <div className="curriculum-section">
+                          <div className="row">
+                            <div className="col-md-12">
+                              <div className="table-responsive mt-30">
+                                {!isTeacher && renderPoint()}
+                                {isTeacher && (
+                                  <ManagePoints
+                                    cards={cards}
+                                    classroom={classroom}
+                                    studentList={studentList}
+                                    reload={reload}
+                                    setReload={setReload}
+                                    setStudentList={setStudentList}
+                                    setCards={setCards}
+                                  />
+                                )}
                               </div>
                             </div>
                           </div>

@@ -1,7 +1,17 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-
-function Header(props) {
+function Header() {
+  const user = useSelector((state) => state.auth.currentUser);
+  const renderAvatar = () => {
+    if (user && user.googleId) return <img src={user.imageUrl} alt="avatar" />;
+    return (
+      <img
+        src={`${process.env.REACT_APP_PUBLIC_URL}/images/hd_dp.jpg`}
+        alt="avatar"
+      />
+    );
+  };
   return (
     <header className="header clearfix">
       <button type="button" id="toggleMenu" className="toggle_menu">
@@ -56,10 +66,7 @@ function Header(props) {
           </li>
           <li className="ui dropdown">
             <Link to="/setting" className="opts_account" title="Account">
-              <img
-                src={`${process.env.REACT_APP_PUBLIC_URL}/images/hd_dp.jpg`}
-                alt="avatar"
-              />
+              {renderAvatar()}
             </Link>
           </li>
         </ul>

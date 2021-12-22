@@ -16,8 +16,9 @@ function Setting() {
     lastName: user.lastName,
     birthday: formatDate(user.birthday),
     sex: user.sex,
+    studentId: user.studentId,
   });
-
+  console.log(user);
   const [errors, setErrors] = useState({
     firstName: null,
     lastName: null,
@@ -49,13 +50,18 @@ function Setting() {
           birthday: event.target.value,
         });
         break;
+      case "studentId":
+        setInput({
+          ...input,
+          studentId: event.target.value,
+        });
+        break;
 
       default:
         setInput({
           ...input,
           sex: event.target.value === "true",
         });
-        console.log("input", input);
 
         break;
     }
@@ -260,6 +266,29 @@ function Setting() {
                               <div className="col-lg-6">
                                 <div className="ui search focus mt-30">
                                   <div className="ui left icon input swdh11 swdh19">
+                                    <input
+                                      className="prompt srch_explore"
+                                      type="text"
+                                      name="studentId"
+                                      defaultValue={input.studentId}
+                                      id="id[studentOd]"
+                                      min="1900-01-01"
+                                      max="2030-12-31"
+                                      onChange={handleChange}
+                                      readOnly={user.studentId !== null}
+                                      placeholder="Nhập mã số sinh viên"
+                                    />
+                                  </div>
+                                  <div className="help-block ml-2">
+                                    Mã số sinh viên
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="row">
+                              <div className="col-lg-6">
+                                <div className="ui search focus mt-30">
+                                  <div className="ui left icon input swdh11 swdh19">
                                     <ul className="radio--group-inline-container_1">
                                       <li>
                                         <div className="radio-item_1">
@@ -312,10 +341,9 @@ function Setting() {
                                       type="text"
                                       name="email"
                                       id="id_email"
-                                      required
                                       defaultValue={user.email}
                                       placeholder="Email"
-                                      disabled
+                                      readOnly
                                     />
                                   </div>
                                   <div className="help-block">

@@ -22,12 +22,14 @@ function Login() {
 
   const responseGoogle = (response) => {
     if (response.profileObj) {
-      const { email, googleId, familyName, givenName } = response.profileObj;
+      const { email, googleId, familyName, givenName, imageUrl } =
+        response.profileObj;
       const input = {
         email,
         googleId,
         firstName: familyName,
         lastName: givenName,
+        imageUrl,
       };
       axios
         .post(`${API_URL}/google`, input)
@@ -69,7 +71,7 @@ function Login() {
     axios
       .post(`${API_URL}/auth/login`, input)
       .then((res) => {
-        const { access_token, user } = res.data;        
+        const { access_token, user } = res.data;
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", JSON.stringify(access_token));
         const action = userLoginSuccess(user);
@@ -177,8 +179,7 @@ function Login() {
               )}
               {!redirectTo && (
                 <p className="mb-0 mt-30 hvsng145">
-                  Bạn chưa có tài khoản?{" "}
-                  <Link to="/signup">Đăng ký</Link>
+                  Bạn chưa có tài khoản? <Link to="/signup">Đăng ký</Link>
                 </p>
               )}
             </div>
