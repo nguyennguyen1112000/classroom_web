@@ -519,7 +519,7 @@ function DetailClass() {
                       id="nav-point-detail"
                       role="tabpanel"
                     >
-                     <ManagePoints cards={cards} classroom={classroom} studentList={studentList} reload={reload} setReload={setReload} setStudentList={setStudentList} setCards={setCards}/>
+                     <ManagePoints cards={cards} classroom={classroom} studentList={studentList} reload={reload} setReload={setReload} setStudentList={setStudentList} setCards={setCards} canUploadStudents={true}/>
                     </div>
                   </div>
                 </div>
