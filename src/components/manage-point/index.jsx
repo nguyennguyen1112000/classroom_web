@@ -13,6 +13,7 @@ ManagePoints.propTypes = {
   setReload: PropTypes.func,
   setStudentList: PropTypes.func,
   setCards: PropTypes.func,
+  canUploadStudents: PropTypes.bool,
 };
 
 function ManagePoints(props) {
@@ -24,6 +25,7 @@ function ManagePoints(props) {
     setReload,
     setStudentList,
     setCards,
+    canUploadStudents,
   } = props;
   const dispatch = useDispatch();
   const API_URL = process.env.REACT_APP_API_URL;
@@ -44,7 +46,7 @@ function ManagePoints(props) {
     a.href = downloadLink;
     a.click();
   };
-
+ 
   const downloadMarkTemplate = (e) => {
     e.preventDefault();
     const downloadLink = `${API_URL}/file/template/mark/${classroom.id}`;
@@ -467,37 +469,38 @@ function ManagePoints(props) {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td className="text-center">001</td>
-                          <td className="cell-ta">Danh sách sinh viên</td>
+                        {canUploadStudents && (
+                          <tr>
+                            <td className="text-center">001</td>
+                            <td className="cell-ta">Danh sách sinh viên</td>
 
-                          <td className="text-center">
-                            <b className="course_active">
-                              {classroom && classroom.studentsFile
-                                ? "Đã cập nhật file"
-                                : "Chưa upload file"}
-                            </b>
-                          </td>
-                          <td className="text-center">
-                            <input
-                              id="uploadFile_0"
-                              type="file"
-                              name="file"
-                              style={{ display: "none" }}
-                              link={`${API_URL}/file/studentList/${
-                                classroom && classroom.id
-                              }`}
-                              onChange={handleChangeFile}
-                            />
-                            <a
-                              href="/"
-                              title="Edit"
-                              className="gray-s"
-                              onClick={handleUploadFile}
-                            >
-                              <i className="uil uil-upload-alt" />
-                            </a>
-                            {/* <a
+                            <td className="text-center">
+                              <b className="course_active">
+                                {classroom && classroom.studentsFile
+                                  ? "Đã cập nhật file"
+                                  : "Chưa upload file"}
+                              </b>
+                            </td>
+                            <td className="text-center">
+                              <input
+                                id="uploadFile_0"
+                                type="file"
+                                name="file"
+                                style={{ display: "none" }}
+                                link={`${API_URL}/file/studentList/${
+                                  classroom && classroom.id
+                                }`}
+                                onChange={handleChangeFile}
+                              />
+                              <a
+                                href="/"
+                                title="Edit"
+                                className="gray-s"
+                                onClick={handleUploadFile}
+                              >
+                                <i className="uil uil-upload-alt" />
+                              </a>
+                              {/* <a
                                                 href="/"
                                                 title="Delete"
                                                 className="gray-s"
@@ -506,8 +509,9 @@ function ManagePoints(props) {
                                               >
                                                 <i className="uil uil-trash-alt" />
                                               </a> */}
-                          </td>
-                        </tr>
+                            </td>
+                          </tr>
+                        )}
                         {cards &&
                           cards.map((card, index) => (
                             <tr key={index}>
@@ -520,7 +524,8 @@ function ManagePoints(props) {
                                   link={`${API_URL}/file/mark/${classroom.id}/${card.id}`}
                                   onChange={handleChangeFile}
                                 />
-                                00{index + 2}
+                                {!canUploadStudents && "00" + (index +1)}
+                                {canUploadStudents && "00" + (index + 2)}
                               </td>
                               <td className="cell-ta">Điểm {card.title}</td>
 

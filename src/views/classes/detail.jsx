@@ -9,7 +9,6 @@ import { authHeader, logOut } from "../../helper/utils";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import PointStructureItem from "../../components/drag-item/point-structure-item";
-import { toast } from "react-toastify";
 import ManagePoints from "../../components/manage-point";
 function DetailClass() {
   const API_URL = process.env.REACT_APP_API_URL;

@@ -81,7 +81,7 @@ function PublicClass() {
       }
     };
     fetchData();
-  }, [ API_URL, code, dispatch, search, user.id]);
+  }, [API_URL, code, dispatch, search, user]);
   // function handleClick() {
   //   setUpdateStudentId(true);
   // }
@@ -569,6 +569,7 @@ function PublicClass() {
                                     setReload={setReload}
                                     setStudentList={setStudentList}
                                     setCards={setCards}
+                                    canUploadStudents = {false}
                                   />
                                 )}
                               </div>
