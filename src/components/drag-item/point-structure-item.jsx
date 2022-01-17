@@ -1,6 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
-import { useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useDispatch } from "react-redux";
 import { userLogout } from "../../actions/auth";

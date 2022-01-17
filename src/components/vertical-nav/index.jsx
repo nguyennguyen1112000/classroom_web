@@ -12,7 +12,7 @@ function VerticalNav(props) {
     logOut();
   }
   const user = useSelector((state) => state.auth.currentUser);
-  
+
   return (
     <nav className="vertical_nav">
       <div className="left_section menu_left" id="js-menu">
@@ -54,13 +54,17 @@ function VerticalNav(props) {
             <ul>
               <li className="menu--item">
                 <Link to="/admin/accounts" className="menu--link" title="Help">
-                  <i class="uil uil-user menu--icon"></i>
+                  <i className="uil uil-user menu--icon"></i>
                   <span className="menu--label">Quản lý tài khoản</span>
                 </Link>
               </li>
               <li className="menu--item">
-                <Link to="/admin/admin-accounts/" className="menu--link" title="Help">
-                  <i class="uil uil-user menu--icon"></i>
+                <Link
+                  to="/admin/admin-accounts/"
+                  className="menu--link"
+                  title="Help"
+                >
+                  <i className="uil uil-user menu--icon"></i>
                   <span className="menu--label">Quản lý tài khoản Admin</span>
                 </Link>
               </li>
@@ -70,7 +74,7 @@ function VerticalNav(props) {
                   className="menu--link"
                   title="Help"
                 >
-                  <i class="uil uil-book-alt menu--icon"></i>
+                  <i className="uil uil-book-alt menu--icon"></i>
                   <span className="menu--label">Quản lý lớp học</span>
                 </Link>
               </li>
