@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { userLogout } from "../../actions/auth";
 import { authHeader, formatDate, logOut } from "../../helper/utils";
-import { useDispatch } from "react-redux";
 import Footer from "../../components/footer";
-import UserRow from "../../components/admin/user-row";
 import CreateAccount from "../../components/modal/create-account";
 function ManageAdminAccounts() {
   const user = useSelector((state) => state.auth.currentUser);

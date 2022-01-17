@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { userLogout } from "../../actions/auth";
 import { authHeader, logOut } from "../../helper/utils";
-import { useDispatch } from "react-redux";
 import Footer from "../../components/footer";
 import UserRow from "../../components/admin/user-row";
 function ManageAccounts() {

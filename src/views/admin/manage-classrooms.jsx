@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { userLogout } from "../../actions/auth";
 import { authHeader, logOut, formatDate } from "../../helper/utils";
-import { useDispatch } from "react-redux";
 import Footer from "../../components/footer";
 function ManageClassrooms() {
   const API_URL = process.env.REACT_APP_API_URL;

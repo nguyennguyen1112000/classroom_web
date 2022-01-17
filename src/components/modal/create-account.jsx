@@ -1,10 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { Redirect } from "react-router-dom";
 import { toast } from "react-toastify";
 import { authHeader } from "../../helper/utils";
-import { createClass } from "../../services/api/class";
 
 function CreateAccount({ reload }) {
   const [input, setInput] = useState({
