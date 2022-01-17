@@ -10,6 +10,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import PointStructureItem from "../../components/drag-item/point-structure-item";
 import ManagePoints from "../../components/manage-point";
+import HistoryReview from "../../components/manage-point/history-review";
 function DetailClass() {
   const API_URL = process.env.REACT_APP_API_URL;
   const PUBLIC_URL = process.env.REACT_APP_PUBLIC_URL;
@@ -163,7 +164,7 @@ function DetailClass() {
               <div className="cmtk_group">
                 <div className="ct-logo">
                   <a href="index.html">
-                    <img src="images/ct_logo.svg" alt="logo" />
+                    <img src="/images/ct_logo.svg" alt="logo" />
                   </a>
                 </div>
                 <div className="cmtk_dt">
@@ -282,16 +283,6 @@ function DetailClass() {
                       role="tablist"
                     >
                       <a
-                        className="nav-item nav-link active"
-                        id="nav-about-tab"
-                        data-toggle="tab"
-                        href="#nav-about"
-                        role="tab"
-                        aria-selected="true"
-                      >
-                        Bài đăng
-                      </a>
-                      <a
                         className="nav-item nav-link"
                         id="nav-courses-tab"
                         data-toggle="tab"
@@ -321,6 +312,16 @@ function DetailClass() {
                       >
                         Điểm số
                       </a>
+                      <a
+                        className="nav-item nav-link active"
+                        id="nav-about-tab"
+                        data-toggle="tab"
+                        href="#nav-about"
+                        role="tab"
+                        aria-selected="true"
+                      >
+                        Phúc khảo điểm
+                      </a>
                     </div>
                   </nav>
                 </div>
@@ -339,35 +340,10 @@ function DetailClass() {
                       id="nav-about"
                       role="tabpanel"
                     >
-                      <div className="student_reviews">
-                        <div className="row">
-                          <div className="col-lg-12">
-                            <div className="review_right">
-                              <div className="review_right_heading">
-                                <h3>Trao đổi với lớp học tại đây</h3>
-                              </div>
-                            </div>
-                            <div className="cmmnt_1526">
-                              <div className="cmnt_group">
-                                <div className="img160">
-                                  <img
-                                    src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                    alt="avatar"
-                                  />
-                                </div>
-                                <textarea
-                                  className="_cmnt001"
-                                  placeholder="Thêm nội dung nào đó cho lớp học của bạn"
-                                  defaultValue={""}
-                                />
-                              </div>
-                              <button className="cmnt-btn" type="submit">
-                                Đăng
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <HistoryReview
+                        classroom={classroom}
+                        isTeacher={true}
+                      />
                     </div>
                     <div
                       className="tab-pane fade"
@@ -401,7 +377,7 @@ function DetailClass() {
                                     <div className="tutor_content_dt">
                                       <div className="tutor150">
                                         <a
-                                          href="instructor_profile_view.html"
+                                          href={"/profile/" + teacher.user.id}
                                           className="tutor_name"
                                         >
                                           {teacher.user.firstName}{" "}
@@ -445,7 +421,7 @@ function DetailClass() {
                                     <div className="tutor_content_dt">
                                       <div className="tutor150">
                                         <a
-                                          href="instructor_profile_view.html"
+                                          href={"/profile/" + stu.user.id}
                                           className="tutor_name"
                                         >
                                           {stu.user.firstName}{" "}
@@ -519,7 +495,16 @@ function DetailClass() {
                       id="nav-point-detail"
                       role="tabpanel"
                     >
-                     <ManagePoints cards={cards} classroom={classroom} studentList={studentList} reload={reload} setReload={setReload} setStudentList={setStudentList} setCards={setCards} canUploadStudents={true}/>
+                      <ManagePoints
+                        cards={cards}
+                        classroom={classroom}
+                        studentList={studentList}
+                        reload={reload}
+                        setReload={setReload}
+                        setStudentList={setStudentList}
+                        setCards={setCards}
+                        canUploadStudents={true}
+                      />
                     </div>
                   </div>
                 </div>

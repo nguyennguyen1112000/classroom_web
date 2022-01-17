@@ -1805,8 +1805,12 @@ table {
     border-bottom: 0 !important;
 }
 
-.course_active {
+.text-active {
     color: #ed2a26;
+}
+
+.text-inactive {
+    color: #1cbbb3;
 }
 
 .ucp-table tbody tr td {

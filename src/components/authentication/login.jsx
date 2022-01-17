@@ -97,7 +97,7 @@ function Login() {
           <div className="col-lg-12">
             <div className="main_logo25" id="logo">
               <a href="index.html">
-                <img src="images/logo.png" alt="" />
+                <img src="/images/logo.png" alt="" />
               </a>
               <a href="index.html">
                 <img className="logo-inverse" src="images/ct_logo.svg" alt="" />

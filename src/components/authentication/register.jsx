@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router";
 import { Link, useLocation } from "react-router-dom";
-import { userLoginSuccess } from "../../actions/auth";
-import { useDispatch } from "react-redux";
 function Register() {
   const API_URL = process.env.REACT_APP_API_URL;
   const [input, setInput] = useState({
@@ -12,17 +10,16 @@ function Register() {
     firstName: "",
     lastName: "",
   });
+
   const [errors, setErrors] = useState({
     email: null,
     password: null,
     firstName: null,
     lastName: null,
   });
-  const [redirect, setRedirect] = useState(false);
-  const dispatch = useDispatch();
   const search = useLocation().search;
   const redirectTo = new URLSearchParams(search).get("redirectTo");
-let history = useHistory();
+  let history = useHistory();
   function handleChange(event) {
     switch (event.target.name) {
       case "email":
@@ -103,7 +100,8 @@ let history = useHistory();
         .post(`${API_URL}/users`, input)
         .then((res) => {
           console.log("Register successfully", res);
-          login(input.email, input.password);
+          history.push("/verify");
+          //login(input.email, input.password);
           let newInput = {};
           newInput.email = "";
           newInput.password = "";
@@ -117,24 +115,7 @@ let history = useHistory();
         });
     }
   }
-  function login(email, password) {
-    axios
-      .post(`${API_URL}/auth/login`, { email, password })
-      .then((res) => {
-        const { access_token, user } = res.data;
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("token", JSON.stringify(access_token));
-        const action = userLoginSuccess(user);
-        dispatch(action);
-        setRedirect(true);
-      })
-      .catch((err) => {
-        console.log("Error", err);
-      });
-  }
-  if (redirect) {
-    history.push(redirectTo == null ? "/" : redirectTo);
-  }
+
   return (
     <div className="sign_in_up_bg">
       <div className="container">
@@ -142,7 +123,7 @@ let history = useHistory();
           <div className="col-lg-12">
             <div className="main_logo25" id="logo">
               <a href="index.html">
-                <img src="images/logo.png" alt="" />
+                <img src="/images/logo.png" alt="" />
               </a>
               <a href="index.html">
                 <img className="logo-inverse" src="images/ct_logo.svg" alt="" />

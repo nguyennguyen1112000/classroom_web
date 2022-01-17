@@ -117,7 +117,15 @@ function Setting() {
           setErrors({ firstName: null, lastName: null });
         })
         .catch((err) => {
-          console.log("Update profile failed", err.message);
+          toast.error(err.response.data.message, {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
         });
     }
   }

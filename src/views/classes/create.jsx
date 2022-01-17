@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { Redirect } from "react-router-dom";
 import { createClass } from "../../services/api/class";
 
 function CreateClass() {
@@ -13,9 +14,10 @@ function CreateClass() {
     topic: null,
     description: null,
   });
+  const [redirect, setRedirect] = useState(false);
   const dispatch = useDispatch();
 
-  function handleChange(event) {    
+  function handleChange(event) {
     switch (event.target.name) {
       case "name":
         setInput({
@@ -58,8 +60,7 @@ function CreateClass() {
       isValid = false;
       errs.description = "Tối đa 220 từ";
     }
-    console.log('err',errs);
-    
+    console.log("err", errs);
 
     setErrors(errs);
     return isValid;
@@ -74,6 +75,9 @@ function CreateClass() {
     }
   }
 
+  if (redirect) {
+    return <Redirect to="/my-classes" />;
+  }
   return (
     <div
       className="course_tabs_1 modal fade"

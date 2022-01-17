@@ -20,9 +20,8 @@ ClassItem.defaultProps = {
 function ClassItem(props) {
   const { code, name, topic, isMyClasses } = props;
   let link;
-  if(isMyClasses)
-  link = `/my-classes/${code}`;
-  else link=`classrooms/${code}`
+  if (isMyClasses) link = `/my-classes/${code}`;
+  else link = `classrooms/${code}`;
   const history = useHistory();
   function handleClick() {
     return history.push(link);
@@ -35,7 +34,7 @@ function ClassItem(props) {
       <div className="fcrse_1 mt-30">
         <div className="tutor_img">
           <Link to={link}>
-            <img src="images/courses/img.jpg" alt="" />
+            <img src="/images/courses/img.jpg" alt="" />
           </Link>
         </div>
         <div className="tutor_content_dt">
@@ -43,9 +42,7 @@ function ClassItem(props) {
             <Link to={link} className="tutor_name">
               {name}
             </Link>
-            <div className="mef78" title="Verify">
-              <i className="uil uil-check-circle" />
-            </div>
+            
           </div>
           <div className="tutor_cate">{topic}</div>
           <button className="live_link" onClick={handleClick}>

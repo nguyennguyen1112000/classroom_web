@@ -32,22 +32,7 @@ function ClassList(props) {
       <div className="sa4d25">
         <div className="container-fluid">
           <div className="row">
-            <div className="col-xl-12 col-lg-8">
-              <div className="section3125">
-                <div className="explore_search">
-                  <div className="ui search focus">
-                    <div className="ui left icon input swdh11">
-                      <input
-                        className="prompt srch_explore"
-                        type="text"
-                        placeholder="Tìm kiếm lớp học..."
-                      />
-                      <i className="uil uil-search-alt icon icon2" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+           
             <div className="col-md-12">
               <div className="_14d25">
                 <div className="row">
@@ -64,7 +49,7 @@ function ClassList(props) {
                   })}
                   {classList.length === 0 && (
                     <div className="verification_content">
-                      <img src="images/verified-account.svg" alt="" />
+                      <img src="/images/verified-account.svg" alt="" />
                       <h4>Chưa có lớp học nào</h4>
                       <p>
                         Bấm nút <strong>Tạo lớp học</strong> ở góc phải màn

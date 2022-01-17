@@ -46,7 +46,7 @@ function ManagePoints(props) {
     a.href = downloadLink;
     a.click();
   };
- 
+
   const downloadMarkTemplate = (e) => {
     e.preventDefault();
     const downloadLink = `${API_URL}/file/template/mark/${classroom.id}`;
@@ -355,7 +355,7 @@ function ManagePoints(props) {
                             ))}
 
                             <td>
-                              <b className="course_active">
+                              <b className="text-active">
                                 {student.finalPoint}
                               </b>
                             </td>
@@ -399,7 +399,7 @@ function ManagePoints(props) {
                             <a
                               href="/"
                               title="Download"
-                              className="course_active"
+                              className="text-active"
                               onClick={downloadStudentsTemplate}
                             >
                               Tải về
@@ -417,7 +417,7 @@ function ManagePoints(props) {
                             <a
                               href="/"
                               title="Download"
-                              className="course_active"
+                              className="text-active"
                               onClick={downloadMarkTemplate}
                             >
                               Tải về
@@ -435,7 +435,7 @@ function ManagePoints(props) {
                             <a
                               href="/"
                               title="Download"
-                              className="course_active"
+                              className="text-active"
                               onClick={exportFinalFile}
                             >
                               Tải về
@@ -475,7 +475,7 @@ function ManagePoints(props) {
                             <td className="cell-ta">Danh sách sinh viên</td>
 
                             <td className="text-center">
-                              <b className="course_active">
+                              <b className="text-active">
                                 {classroom && classroom.studentsFile
                                   ? "Đã cập nhật file"
                                   : "Chưa upload file"}
@@ -524,13 +524,13 @@ function ManagePoints(props) {
                                   link={`${API_URL}/file/mark/${classroom.id}/${card.id}`}
                                   onChange={handleChangeFile}
                                 />
-                                {!canUploadStudents && "00" + (index +1)}
+                                {!canUploadStudents && "00" + (index + 1)}
                                 {canUploadStudents && "00" + (index + 2)}
                               </td>
                               <td className="cell-ta">Điểm {card.title}</td>
 
                               <td className="text-center">
-                                <b className="course_active">
+                                <b className="text-active">
                                   {card.markFile
                                     ? "Đã cập nhật file"
                                     : "Chưa upload file"}

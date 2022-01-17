@@ -8,6 +8,8 @@ import { userLogout } from "../../actions/auth";
 import PointStructureItem from "../../components/drag-item/point-structure-item";
 import Footer from "../../components/footer";
 import ManagePoints from "../../components/manage-point";
+import HistoryReview from "../../components/manage-point/history-review";
+import ReviewRequest from "../../components/manage-point/review-request";
 import { authHeader, logOut } from "../../helper/utils";
 import { addUserToClass } from "../../services/api/class";
 
@@ -21,6 +23,10 @@ function PublicClass() {
   const [point, setPoint] = useState([]);
   const [studentList, setStudentList] = useState([]);
   const [reload, setReload] = useState(false);
+  const [pointReview, setPointReview] = useState({
+    isDisplay: false,
+    review: null,
+  });
   const dispatch = useDispatch();
 
   let { code } = useParams();
@@ -56,9 +62,10 @@ function PublicClass() {
           setExisted(true);
           setClassroom(result.data);
 
-          const teacher =
+          let teacher =
             result.data.teachers.length > 0 &&
             result.data.teachers.some((teacher) => teacher.user.id === user.id);
+          if (user.role == "admin") teacher = true;
           setIsTeacher(teacher);
           setCards(result.data.pointStructures);
           if (teacher) {
@@ -85,13 +92,18 @@ function PublicClass() {
   // function handleClick() {
   //   setUpdateStudentId(true);
   // }
+  const reloadPage = () => {
+    setReload(!reload);
+  };
 
+  const setReview = () => {
+    setPointReview({ ...pointReview, isDisplay: false });
+  };
   function formatDate(date) {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }
-  const renderPoint = () => {
-    console.log("user", user);
 
+  const renderPoint = () => {
     if (user && user.studentId)
       return (
         <table className="table ucp-table">
@@ -100,7 +112,20 @@ function PublicClass() {
               <th>MSSV</th>
               <th>Họ và tên</th>
               {cards &&
-                cards.map((card) => <th key={card.id}>{card.title}</th>)}
+                cards.map((card) => (
+                  <th key={card.id}>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      data-value={card.id}
+                      onClick={handleClickReview}
+                    >
+                      Phúc khảo
+                    </button>
+                    <br />
+
+                    {card.title}
+                  </th>
+                ))}
               <th>Tổng kết</th>
             </tr>
           </thead>
@@ -113,8 +138,8 @@ function PublicClass() {
                 </td>
                 {point &&
                   point.map((p) => (
-                    <td>
-                      <b className="course_active">{p.detailPoint}</b>
+                    <td key={p.id}>
+                      <b className="text-active">{p.detailPoint}</b>
                     </td>
                   ))}
               </tr>
@@ -123,6 +148,18 @@ function PublicClass() {
         </table>
       );
     return <div>Vui lòng cập nhật MSSV để coi điểm</div>;
+  };
+
+  const renderReviewForm = () => {
+    return (
+      <ReviewRequest
+        isDisplay={pointReview.isDisplay}
+        detailPoint={pointReview.review}
+        classroom={classroom}
+        setPointReview={setReview}
+        reload={reloadPage}
+      />
+    );
   };
   const moveCard = (dragIndex, hoverIndex) => {
     const dragCard = cards[dragIndex];
@@ -165,6 +202,21 @@ function PublicClass() {
           console.log("Error", err);
         });
     setCards(newCards);
+  };
+
+  /***************Handle Click*******************/
+  const handleClickReview = (event) => {
+    const pointId = event.currentTarget.getAttribute("data-value");
+    const review = point.filter((x) => x.id == pointId);
+    if (review.length > 0 && review[0].isPublic === false) {
+      alert("Chưa có điểm");
+      return;
+    }
+    if (review.length > 0 && review[0].isPublic === true)
+      setPointReview({
+        isDisplay: true,
+        review: review[0],
+      });
   };
   const handleClickAdd = () => {
     const nextId = Math.max(...cards.map((card) => card.id)) + 1;
@@ -211,7 +263,7 @@ function PublicClass() {
     );
   };
   if (redirect) {
-    return <Redirect to={`/my-classes/${classroom.code}`} />;
+    return <Redirect to={`/my-classes/${code}`} />;
   }
   if (existed)
     return (
@@ -281,22 +333,12 @@ function PublicClass() {
                       role="tablist"
                     >
                       <a
-                        className="nav-item nav-link active"
-                        id="nav-about-tab"
-                        data-toggle="tab"
-                        href="#nav-about"
-                        role="tab"
-                        aria-selected="true"
-                      >
-                        Bài đăng
-                      </a>
-                      <a
                         className="nav-item nav-link"
                         id="nav-courses-tab"
                         data-toggle="tab"
                         href="#nav-courses"
                         role="tab"
-                        aria-selected="false"
+                        aria-selected="true"
                       >
                         Thành viên
                       </a>
@@ -320,6 +362,16 @@ function PublicClass() {
                       >
                         Điểm số
                       </a>
+                      <a
+                        className="nav-item nav-link active"
+                        id="nav-about-tab"
+                        data-toggle="tab"
+                        href="#nav-about"
+                        role="tab"
+                        aria-selected="false"
+                      >
+                        Phúc khảo điểm
+                      </a>
                     </div>
                   </nav>
                 </div>
@@ -339,35 +391,10 @@ function PublicClass() {
                       id="nav-about"
                       role="tabpanel"
                     >
-                      <div className="student_reviews">
-                        <div className="row">
-                          <div className="col-lg-12">
-                            <div className="review_right">
-                              <div className="review_right_heading">
-                                <h3>Trao đổi với lớp học tại đây</h3>
-                              </div>
-                            </div>
-                            <div className="cmmnt_1526">
-                              <div className="cmnt_group">
-                                <div className="img160">
-                                  <img
-                                    src={`${process.env.REACT_APP_PUBLIC_URL}/images/left-imgs/img-1.jpg`}
-                                    alt="avatar"
-                                  />
-                                </div>
-                                <textarea
-                                  className="_cmnt001"
-                                  placeholder="Thêm nội dung nào đó cho lớp học của bạn"
-                                  defaultValue={""}
-                                />
-                              </div>
-                              <button className="cmnt-btn" type="submit">
-                                Đăng
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <HistoryReview
+                        classroom={classroom}
+                        isTeacher={isTeacher}
+                      />
                     </div>
                     <div
                       className="tab-pane fade"
@@ -389,7 +416,7 @@ function PublicClass() {
                                     <div className="tutor_content_dt">
                                       <div className="tutor150">
                                         <a
-                                          href="instructor_profile_view.html"
+                                          href={"/profile/" + teacher.user.id}
                                           className="tutor_name"
                                         >
                                           {teacher.user.firstName}{" "}
@@ -421,7 +448,7 @@ function PublicClass() {
                                     <div className="tutor_content_dt">
                                       <div className="tutor150">
                                         <a
-                                          href="instructor_profile_view.html"
+                                          href={"/profile/" + stu.user.id}
                                           className="tutor_name"
                                         >
                                           {stu.user.firstName}{" "}
@@ -569,7 +596,7 @@ function PublicClass() {
                                     setReload={setReload}
                                     setStudentList={setStudentList}
                                     setCards={setCards}
-                                    canUploadStudents = {false}
+                                    canUploadStudents={false}
                                   />
                                 )}
                               </div>
@@ -577,6 +604,7 @@ function PublicClass() {
                           </div>
                         </div>
                       </div>
+                      {!isTeacher && renderReviewForm()}
                     </div>
                   </div>
                 </div>
@@ -594,11 +622,6 @@ function PublicClass() {
           <div className="row">
             <div className="col-md-12">
               <div className="cmtk_group">
-                <div className="ct-logo">
-                  <a href="index.html">
-                    <img src="images/ct_logo.svg" alt="" />
-                  </a>
-                </div>
                 <div className="cmtk_dt">
                   <h1 className="title_404">404</h1>
                   <h4 className="thnk_title1">Lớp học không tồn tại</h4>

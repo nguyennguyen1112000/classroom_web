@@ -3487,6 +3487,7 @@ i.icon2 {
   width: 100%;
   background: #fff;
   border-radius: 3px;
+  border-bottom: 5px solid #e27171;
 }
 
 .review_item {
@@ -3887,7 +3888,40 @@ i.icon2 {
   padding: 0px 30px;
 }
 
+.back-btn {
+  margin-top: 15px;
+  float: left;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Roboto", sans-serif;
+  color: #fff;
+  background: #ed2a26;
+  border-radius: 3px;
+  border: 0;
+  height: 40px;
+  padding: 0px 30px;
+}
+
 .cmnt-btn:hover {
+  color: #fff;
+  background: #333;
+}
+
+.cancel-btn {
+  margin-top: 15px;
+  float: right;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Roboto", sans-serif;
+  color: #fff;
+  background: rgb(156, 154, 154);
+  border-radius: 3px;
+  border: 0;
+  height: 40px;
+  padding: 0px 30px;
+}
+
+.cancel-btn:hover {
   color: #fff;
   background: #333;
 }
@@ -8380,4 +8414,8 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.dropdown-menu {
+    width: 300px !important;
 }
