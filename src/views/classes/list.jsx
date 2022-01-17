@@ -15,7 +15,6 @@ ClassList.defaultProps = {
 
 function ClassList(props) {
   const { isMyClasses, isMyJoinedClasses } = props;
-
   const dispatch = useDispatch();
   useEffect(() => {
     if (isMyClasses) dispatch(getAll());

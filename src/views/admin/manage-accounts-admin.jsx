@@ -8,7 +8,6 @@ import Footer from "../../components/footer";
 import UserRow from "../../components/admin/user-row";
 import CreateAccount from "../../components/modal/create-account";
 function ManageAdminAccounts() {
-  const API_URL = process.env.REACT_APP_API_URL;
   const user = useSelector((state) => state.auth.currentUser);
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -18,6 +17,8 @@ function ManageAdminAccounts() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const API_URL = process.env.REACT_APP_API_URL;
+
         const result = await axios.get(
           `${API_URL}/users/admin?search=${search}&sortAsc=${sort}`,
           authHeader()
@@ -35,7 +36,7 @@ function ManageAdminAccounts() {
       }
     };
     fetchData();
-  }, [sort, search, reload]);
+  }, [sort, search, reload, dispatch]);
   const handleChange = (event) => {
     setSearch(event.target.value);
   };

@@ -38,7 +38,7 @@ function ManagePoints(props) {
       }
     }, 3000);
     return () => clearTimeout(timeoutId);
-  }, [pointUpdated]);
+  }, [pointUpdated, classroom]);
   const downloadStudentsTemplate = (e) => {
     e.preventDefault();
     const downloadLink = `${API_URL}/file/template/studentList`;

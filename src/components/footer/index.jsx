@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import CreateClass from "../../views/classes/create";
 
 function Footer() {

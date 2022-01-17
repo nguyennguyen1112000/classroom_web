@@ -1,9 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, Redirect } from "react-router-dom";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-//import PropTypes from 'prop-types';
+import { Link } from "react-router-dom";
 import { userLogout } from "../../actions/auth";
 import { authHeader, logOut, findDaysDifferent } from "../../helper/utils";
 function Header() {
@@ -32,7 +30,7 @@ function Header() {
       }
     };
     fetchData();
-  }, []);
+  }, [dispatch]);
 
   const handleChangeCode = (event) => {
     setCode(event.target.value);
@@ -73,7 +71,6 @@ function Header() {
               className="live_link"
               style={{ display: "table-cell" }}
               href={`/classrooms/${code}`}
-              target="_blank"
             >
               Tham gia
             </a>
@@ -96,13 +93,12 @@ function Header() {
 
           <li className="dropdown">
             <a
-              href="#"
+              href="/"
               className="option_links"
               title="Notifications"
               type="button"
               id="dropdownMenuButton"
               data-toggle="dropdown"
-              aria-haspopup="true"
               aria-expanded="false"
             >
               <i className="uil uil-bell" />
@@ -134,7 +130,7 @@ function Header() {
                   </a>
                 ))
               ) : (
-                <a href="#" className="channel_my item dropdown-item">
+                <a href="/" className="channel_my item dropdown-item">
                   Không có thông báo mới
                 </a>
               )}
@@ -145,15 +141,13 @@ function Header() {
           </li>
           <li className="dropdown">
             <a
-              href="#"
-              className="option_links"
+              href="/"
+              className="option_links opts_account"
               title="Notifications"
               type="button"
               id="dropdownProfile"
               data-toggle="dropdown"
-              aria-haspopup="true"
               aria-expanded="false"
-              className="opts_account"
             >
               {user && user.imageUrl ? (
                 <img src={user.imageUrl} alt="" />

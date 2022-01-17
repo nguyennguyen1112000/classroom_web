@@ -94,7 +94,7 @@ function Comments({ comment, reload, user }) {
           </div>
           {comment.created_by.id === user.id && (
             <div className="eps_dots more_dropdown">
-              <a href="#">
+              <a href="/">
                 <i className="uil uil-ellipsis-v" />
               </a>
 

@@ -16,12 +16,6 @@ function VerifyAccount() {
     const fetchData = async () => {
       try {
         const API_URL = process.env.REACT_APP_API_URL;
-        console.log({
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
         axios
           .post(
             `${API_URL}/auth/verify`,
@@ -48,7 +42,7 @@ function VerifyAccount() {
       }
     };
     fetchData();
-  }, []);
+  }, [dispatch, search]);
 
   if (redirect) {
     history.push("/");

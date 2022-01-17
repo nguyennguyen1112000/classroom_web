@@ -1,13 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import {  useParams } from "react-router";
+import { useParams } from "react-router";
 import { userLogout } from "../../actions/auth";
 import Footer from "../../components/footer";
 import { authHeader, logOut } from "../../helper/utils";
 
 function Info() {
-  const API_URL = process.env.REACT_APP_API_URL;
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
 
@@ -15,6 +14,8 @@ function Info() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const API_URL = process.env.REACT_APP_API_URL;
+
         const result = await axios.get(`${API_URL}/users/${id}`, authHeader());
         if (result.data) {
           setUser(result.data);
@@ -29,8 +30,7 @@ function Info() {
       }
     };
     fetchData();
-  }, []);
-  console.log("user", user);
+  }, [dispatch]);
 
   function formatDate(date) {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
@@ -96,7 +96,7 @@ function Info() {
         <Footer />
       </div>
     );
-    else return (<div></div>)
+  else return <div></div>;
 }
 
 export default Info;

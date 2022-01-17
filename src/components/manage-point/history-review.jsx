@@ -15,14 +15,14 @@ function HistoryReview({ classroom, isTeacher }) {
   const [history, setHistory] = useState([]);
   const [pointReviews, setPointReviews] = useState([]);
   const [submit, setSubmit] = useState(false);
-  const [filter, setFilter] = useState({ status: "all", search: "" });
   const user = useSelector((state) => state.auth.currentUser);
-  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (classroom) {
+          const API_URL = process.env.REACT_APP_API_URL;
+
           const result = await axios.get(
             `${API_URL}/point-review/${classroom.id}`,
             authHeader()

@@ -18,7 +18,7 @@ function UserRow({ user, index, reload }) {
   const dispatch = useDispatch();
   useEffect(() => {
     setStudentId(user.studentId);
-  }, []);
+  }, [user]);
   const handleClick = () => {
     if (isEdit) {
       const API_URL = process.env.REACT_APP_API_URL;
