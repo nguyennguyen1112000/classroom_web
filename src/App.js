@@ -67,7 +67,7 @@ function App() {
           path="/classrooms/:code/reviews/:reviewId"
           exact
         />
-        <PrivateRoute component={Setting} path="/setting" exact />
+        {/* <PrivateRoute component={Setting} path="/setting" exact />
         <PrivateRoute component={Info} path="/profile/:id" exact />
         <PrivateRoute component={ManageAccounts} path="/admin/accounts" exact />
         <PrivateRoute
@@ -80,7 +80,7 @@ function App() {
           path="/admin/classrooms"
           exact
         />
-        <PrivateRoute component={Notifications} path="/notifications" exact />
+        <PrivateRoute component={Notifications} path="/notifications" exact /> */}
         <ToastContainer />
       </div>
     </Router>
