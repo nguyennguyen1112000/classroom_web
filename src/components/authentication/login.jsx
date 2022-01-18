@@ -43,7 +43,7 @@ function Login() {
         })
         .catch((err) => {
           console.log("Error", err);
-          setError("Đã có lỗi xảy ra trong lúc đăng nhập, vui lòng thử lại");
+          setError(err.response.data.message);
         });
     }
   };
@@ -74,6 +74,7 @@ function Login() {
         const { access_token, user } = res.data;
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", JSON.stringify(access_token));
+
         const action = userLoginSuccess(user);
         dispatch(action);
         let newInput = {};
