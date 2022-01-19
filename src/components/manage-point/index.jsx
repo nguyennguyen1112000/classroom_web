@@ -14,6 +14,7 @@ ManagePoints.propTypes = {
   setStudentList: PropTypes.func,
   setCards: PropTypes.func,
   canUploadStudents: PropTypes.bool,
+  continueUpdate: PropTypes.bool,
 };
 
 function ManagePoints(props) {
@@ -26,19 +27,21 @@ function ManagePoints(props) {
     setStudentList,
     setCards,
     canUploadStudents,
+    continueUpdate,
   } = props;
   const dispatch = useDispatch();
   const API_URL = process.env.REACT_APP_API_URL;
   const [pointUpdated, setPointUpdated] = useState([]);
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (classroom) {
+      if (classroom && continueUpdate) {
         updatePoints(classroom.id, pointUpdated);
         setPointUpdated([]);
       }
-    }, 3000);
+    }, 5000);
     return () => clearTimeout(timeoutId);
   }, [pointUpdated, classroom]);
+  
   const downloadStudentsTemplate = (e) => {
     e.preventDefault();
     const downloadLink = `${API_URL}/file/template/studentList`;
@@ -97,7 +100,6 @@ function ManagePoints(props) {
   /****************** Handle change input *********************/
   const handleUpdatePoints = (e) => {
     const newPoint = e.target.value;
-    console.log("point", newPoint);
 
     let list = studentList;
     const studentId = e.currentTarget.getAttribute("data-value");
@@ -123,16 +125,6 @@ function ManagePoints(props) {
     if (currentIndex >= 0) newPointUpdated[currentIndex] = currentPoint;
     else newPointUpdated.push(currentPoint);
     setPointUpdated(newPointUpdated);
-
-    // setTimeout(
-    //   updatePoints(
-    //     classroom.id,
-    //     newPoint,
-    //     assignmentId,
-    //     currentStudent.studentId
-    //   ),
-    //   3000
-    // );
   };
 
   const updatePoints = (classroomId, updatePointsDto) => {

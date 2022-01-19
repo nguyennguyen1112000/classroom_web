@@ -12,7 +12,7 @@ import HistoryReview from "../../components/manage-point/history-review";
 import ReviewRequest from "../../components/manage-point/review-request";
 import { authHeader, logOut } from "../../helper/utils";
 import { addUserToClass } from "../../services/api/class";
-
+import InviteUserModal from "../../components/modal/invite-user";
 function PublicClass() {
   const API_URL = process.env.REACT_APP_API_URL;
   const [classroom, setClassroom] = useState();
@@ -28,10 +28,12 @@ function PublicClass() {
     review: null,
   });
   const dispatch = useDispatch();
+  const [modalId, setModalId] = useState("inviteTeachers");
 
   let { code } = useParams();
   const search = useLocation().search;
   const user = useSelector((state) => state.auth.currentUser);
+  const [userRole, setUserRole] = useState("giảng viên");
   useEffect(() => {
     let role = new URLSearchParams(search).get("role");
     const fetchData = async () => {
@@ -88,10 +90,8 @@ function PublicClass() {
       }
     };
     fetchData();
-  }, [API_URL, code, dispatch, search, user]);
-  // function handleClick() {
-  //   setUpdateStudentId(true);
-  // }
+  }, [API_URL, code, dispatch, reload]);
+
   const reloadPage = () => {
     setReload(!reload);
   };
@@ -102,6 +102,8 @@ function PublicClass() {
   function formatDate(date) {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }
+
+  const [isPointTab, setIsPointTab] = useState(false);
 
   const renderPoint = () => {
     if (user && user.studentId)
@@ -205,6 +207,20 @@ function PublicClass() {
   };
 
   /***************Handle Click*******************/
+  const handleTabClick = (event) => {
+    const id = event.target.id;
+    if (id === "nav-point-detail-tab") setIsPointTab(true);
+    else setIsPointTab(false);
+  };
+  function handleClickTeachers(event) {
+    setModalId("inviteTeachers");
+    setUserRole("teacher");
+  }
+  function handleClickStudents(event) {
+    setModalId("inviteStudents");
+    setUserRole("student");
+  }
+
   const handleClickReview = (event) => {
     const pointId = event.currentTarget.getAttribute("data-value");
     const review = point.filter((x) => x.id == pointId);
@@ -333,12 +349,13 @@ function PublicClass() {
                       role="tablist"
                     >
                       <a
-                        className="nav-item nav-link"
+                        className="nav-item nav-link active"
                         id="nav-courses-tab"
                         data-toggle="tab"
                         href="#nav-courses"
                         role="tab"
                         aria-selected="true"
+                        onClick={handleTabClick}
                       >
                         Thành viên
                       </a>
@@ -349,6 +366,7 @@ function PublicClass() {
                         href="#nav-point-structure"
                         role="tab"
                         aria-selected="false"
+                        onClick={handleTabClick}
                       >
                         Cấu trúc điểm
                       </a>
@@ -359,16 +377,18 @@ function PublicClass() {
                         href="#nav-point-detail"
                         role="tab"
                         aria-selected="false"
+                        onClick={handleTabClick}
                       >
                         Điểm số
                       </a>
                       <a
-                        className="nav-item nav-link active"
+                        className="nav-item nav-link"
                         id="nav-about-tab"
                         data-toggle="tab"
                         href="#nav-about"
                         role="tab"
                         aria-selected="false"
+                        onClick={handleTabClick}
                       >
                         Phúc khảo điểm
                       </a>
@@ -387,7 +407,7 @@ function PublicClass() {
                 <div className="course_tab_content">
                   <div className="tab-content" id="nav-tabContent">
                     <div
-                      className="tab-pane fade show active"
+                      className="tab-pane fade"
                       id="nav-about"
                       role="tabpanel"
                     >
@@ -397,12 +417,31 @@ function PublicClass() {
                       />
                     </div>
                     <div
-                      className="tab-pane fade"
+                      className="tab-pane fade  show active"
                       id="nav-courses"
                       role="tabpanel"
                     >
                       <div className="crse_content">
                         <h3>Giáo viên</h3>
+                        {isTeacher && (
+                          <InviteUserModal
+                            modalId={modalId}
+                            role={userRole}
+                            classroomId={classroom && classroom.id}
+                          />
+                        )}
+                        {isTeacher && (
+                          <a
+                            className="option_links"
+                            title="Messages"
+                            href="/"
+                            data-toggle="modal"
+                            data-target={`#${modalId}`}
+                            onClick={handleClickTeachers}
+                          >
+                            <i className="uil uil-user-plus"></i>
+                          </a>
+                        )}
 
                         <div className="_14d25">
                           <div className="row">
@@ -435,6 +474,18 @@ function PublicClass() {
                       </div>
                       <div className="crse_content">
                         <h3>Sinh viên</h3>
+                        {isTeacher && (
+                          <a
+                            className="option_links"
+                            title="Messages"
+                            href="/"
+                            data-toggle="modal"
+                            data-target={`#${modalId}`}
+                            onClick={handleClickStudents}
+                          >
+                            <i className="uil uil-user-plus"></i>
+                          </a>
+                        )}
 
                         <div className="_14d25">
                           <div className="row">
@@ -597,6 +648,7 @@ function PublicClass() {
                                     setStudentList={setStudentList}
                                     setCards={setCards}
                                     canUploadStudents={false}
+                                    continueUpdate={isPointTab}
                                   />
                                 )}
                               </div>

@@ -30,6 +30,10 @@ function ReviewRequest({
         }
       : null
   );
+  const [errors, setErrors] = useState({
+    point: null,
+    reason: null,
+  });
   const user = useSelector((state) => state.auth.currentUser);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -41,6 +45,30 @@ function ReviewRequest({
         reasonToReview: "",
       });
   }, [detailPoint]);
+  function validate() {
+    let isValid = true;
+    var errs = {};
+    console.log(review);
+    
+    if (!review.requestPoint) {
+      isValid = false;
+      errs.point = "Không được để trống";
+    }
+
+    if (review.requestPoint !== 0 && !parseFloat(review.requestPoint)) {
+      isValid = false;
+      errs.point = "Điểm phải là một số thực";
+    }
+
+    if (!review.reasonToReview) {
+      isValid = false;
+      errs.reason = "Lý do không được để trống";
+    }
+
+    setErrors(errs);
+
+    return isValid;
+  }
   /****************** On key press *********************/
   function onKeyPress(event) {
     if (!/^[+-]?\d*(?:[.]\d*)?$/.test(event.key)) {
@@ -48,16 +76,19 @@ function ReviewRequest({
     }
   }
   async function handleSubmit() {
+    if (!validate()) return;
+    setErrors({ point: null, reason: null });
     const API_URL = process.env.REACT_APP_API_URL;
-    if(!user.studentId) toast.error("Cập nhật MSSV trước khi phúc khảo", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    if (!user.studentId)
+      toast.error("Cập nhật MSSV trước khi phúc khảo", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     const canReview = await axios.get(
       `${API_URL}/point-review/can-request/${review.assignmentId}`,
       authHeader()
@@ -143,6 +174,9 @@ function ReviewRequest({
                     onChange={handleChange}
                   />
                 </div>
+                {errors.point && (
+                  <div className="help-block">{errors.point}</div>
+                )}
               </div>
             </div>
             <div className="col-lg-12 col-md-12">
@@ -158,9 +192,9 @@ function ReviewRequest({
                     />
                   </div>
                 </div>
-                <div className="help-block">
-                  Sinh viên trình bày lý do cho điểm số mong muốn của bản thân
-                </div>
+                {errors.reason && (
+                  <div className="help-block">{errors.reason}</div>
+                )}
               </div>
             </div>
             <button className="cmnt-btn" onClick={handleSubmit}>

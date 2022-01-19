@@ -50,6 +50,7 @@ function HistoryReview({ classroom, isTeacher }) {
     };
     fetchData();
   }, [classroom, submit]);
+  
 
   const handleChange = (event) => {
     const pointReviewId = +event.target.getAttribute("data-value");
@@ -171,33 +172,7 @@ function HistoryReview({ classroom, isTeacher }) {
       else
         return (
           <div className="row">
-            <div className="col-lg-12 col-md-12">
-              <ul className="more_options_tt">
-                <li>
-                  <button className="more_items_14 active">ALL</button>
-                </li>
-                <li>
-                  <button className="more_items_14">PENDING</button>
-                </li>
-                <li>
-                  <button className="more_items_14">CLOSED</button>
-                </li>
-                <li>
-                  <div className="explore_search">
-                    <div className="ui search focus">
-                      <div className="ui left icon input swdh11 swdh15">
-                        <input
-                          className="prompt srch_explore"
-                          type="text"
-                          placeholder="Tìm kiếm"
-                        />
-                        <i className="uil uil-search-alt icon icon8" />
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
+
             <div className="col-lg-12 col-md-12 mt-2">
               <table className="table ucp-table">
                 <thead className="thead-s">

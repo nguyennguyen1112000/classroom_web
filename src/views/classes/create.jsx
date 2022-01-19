@@ -72,6 +72,7 @@ function CreateClass() {
       let newInput = { name: "", description: "", topic: "" };
       setInput(newInput);
       document.getElementById("close-create-modal").click();
+      setRedirect(true);
     }
   }
 

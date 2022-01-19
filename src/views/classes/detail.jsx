@@ -24,6 +24,7 @@ function DetailClass() {
   const [cards, setCards] = useState([]);
   const [reload, setReload] = useState(false);
   const [studentList, setStudentList] = useState([]);
+  const [isPointTab, setIsPointTab] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,7 +54,7 @@ function DetailClass() {
       }
     };
     fetchData();
-  }, [API_URL, code, dispatch, user.id, reload]);
+  }, [API_URL, code, dispatch, reload]);
 
   /***********************Format*************/
   function formatDate(date) {
@@ -61,6 +62,11 @@ function DetailClass() {
   }
 
   /***************** Handle click *********************/
+  const handleTabClick = (event) => {
+    const id = event.target.id;
+    if (id === "nav-point-detail-tab") setIsPointTab(true);
+    else setIsPointTab(false);
+  };
   function handleClickTeachers(event) {
     setModalId("inviteTeachers");
     setRole("teacher");
@@ -283,12 +289,13 @@ function DetailClass() {
                       role="tablist"
                     >
                       <a
-                        className="nav-item nav-link"
+                        className="nav-item nav-link  active"
                         id="nav-courses-tab"
                         data-toggle="tab"
                         href="#nav-courses"
                         role="tab"
                         aria-selected="false"
+                        onClick={handleTabClick}
                       >
                         Thành viên
                       </a>
@@ -299,6 +306,7 @@ function DetailClass() {
                         href="#nav-point-structure"
                         role="tab"
                         aria-selected="false"
+                        onClick={handleTabClick}
                       >
                         Cấu trúc điểm
                       </a>
@@ -309,16 +317,18 @@ function DetailClass() {
                         href="#nav-point-detail"
                         role="tab"
                         aria-selected="false"
+                        onClick={handleTabClick}
                       >
                         Điểm số
                       </a>
                       <a
-                        className="nav-item nav-link active"
+                        className="nav-item nav-link"
                         id="nav-about-tab"
                         data-toggle="tab"
                         href="#nav-about"
                         role="tab"
                         aria-selected="true"
+                        onClick={handleTabClick}
                       >
                         Phúc khảo điểm
                       </a>
@@ -336,23 +346,20 @@ function DetailClass() {
                 <div className="course_tab_content">
                   <div className="tab-content" id="nav-tabContent">
                     <div
-                      className="tab-pane fade show active"
+                      className="tab-pane fade"
                       id="nav-about"
                       role="tabpanel"
                     >
-                      <HistoryReview
-                        classroom={classroom}
-                        isTeacher={true}
-                      />
+                      <HistoryReview classroom={classroom} isTeacher={true} />
                     </div>
                     <div
-                      className="tab-pane fade"
+                      className="tab-pane fade show active"
                       id="nav-courses"
                       role="tabpanel"
                     >
                       <div className="crse_content">
                         <h3>
-                          Giáo viên
+                          Giảng viên
                           <a
                             className="option_links"
                             title="Messages"
@@ -504,6 +511,7 @@ function DetailClass() {
                         setStudentList={setStudentList}
                         setCards={setCards}
                         canUploadStudents={true}
+                        continueUpdate={isPointTab}
                       />
                     </div>
                   </div>

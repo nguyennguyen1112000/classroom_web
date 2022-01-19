@@ -165,10 +165,23 @@ function PointStructureItem({
     setEditMode(!editMode);
   }
   function handleSave() {
+    if (!input.title) {
+      alert("Tên cột điểm không được để trống");
+      return;
+    }
+
+    if (!input.point) {
+      alert("Điểm không được để trống");
+      return;
+    }
     setEditMode(false);
     if (isNew) {
       axios
-        .post(`${API_URL}/point-structure`, {...input, classroomId:classroomId, order}, authHeader())
+        .post(
+          `${API_URL}/point-structure`,
+          { ...input, classroomId: classroomId, order },
+          authHeader()
+        )
         .then((res) => {
           const newCard = { title: res.data.title, point: res.data.point };
           setInput(newCard);
